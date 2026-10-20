@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Not Yönetimi | Beyza Özcan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #F7F5F1;
+            color: #2B2A2A;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 163, 115, 0.22);
+        }
+        .admin-sidebar {
+            background: #2B2A2A;
+        }
+        .admin-nav-active {
+            background: rgba(212, 163, 115, 0.18);
+            color: #F3E8DF;
+        }
+        .notes-panel-visible {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+        }
+        #loginPanel.hidden,
+        #notesPanel.hidden,
+        #contentPanel.hidden {
+            display: none;
+        }
+        @media (min-width: 1024px) {
+            .notes-panel-visible {
+                grid-template-columns: 250px minmax(0, 1fr);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <main class="min-h-screen">
+        <section id="loginPanel" class="min-h-screen flex items-center justify-center px-4 py-10">
+            <div class="w-full max-w-md">
+                <a href="index.html" class="inline-block mb-6 text-sm text-[#8C857B] hover:text-[#D4A373] transition-colors">&larr; Siteye dön</a>
+                <p id="setupStatus" class="hidden glass-card rounded-2xl p-5 text-center text-sm text-[#8C857B] mb-6" role="alert"></p>
+                <div class="glass-card rounded-3xl p-6 md:p-8 shadow-sm">
+                    <div class="text-center mb-7">
+                        <p class="text-xs tracking-[0.25em] uppercase text-[#D4A373]">Özel Yönetim</p>
+                        <h1 class="font-serif text-4xl mt-3">Yönetici Girişi</h1>
+                        <p class="text-sm text-[#8C857B] mt-2">Yönetim paneline devam etmek için giriş yap.</p>
+                    </div>
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-[#8C857B] mb-1" for="adminEmail">E-posta</label>
+                            <input id="adminEmail" type="email" autocomplete="username" required readonly class="w-full px-4 py-3 rounded-xl border border-[#D4A373]/30 bg-white/70 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-[#8C857B] mb-1" for="adminPassword">Şifre</label>
+                            <input id="adminPassword" type="password" autocomplete="current-password" required class="w-full px-4 py-3 rounded-xl border border-[#D4A373]/30 bg-white/70 text-sm focus:outline-none focus:border-[#D4A373]">
+                        </div>
+                        <button id="loginButton" type="submit" class="w-full rounded-xl bg-[#D4A373] py-3 text-white text-sm font-medium hover:bg-[#c59464] transition-colors">Giriş Yap</button>
+                        <p id="loginStatus" class="min-h-5 text-center text-sm text-[#8C857B]" role="status" aria-live="polite"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="notesPanel" class="hidden min-h-screen">
+            <aside class="admin-sidebar flex flex-col px-5 py-7 text-white">
+                <a href="index.html" class="font-serif text-2xl font-semibold tracking-wide">
+                    <span class="text-[#D4A373]">✦</span> Beyza Özcan
+                </a>
+                <p class="mt-1 text-xs text-white/50">Yönetim Paneli</p>
+
+                <nav class="mt-12 space-y-2" aria-label="Yönetim menüsü">
+                    <a href="#messages" class="admin-nav-active flex items-center gap-3 rounded-xl px-4 py-3 text-sm">
+                        <i class="fa-regular fa-envelope w-4"></i>
+                        Gelen Notlar
+                    </a>
+                    <button type="button" data-admin-section-target="content" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 hover:bg-white/10 hover:text-white transition-colors text-left">
+                        <i class="fa-regular fa-images w-4"></i>
+                        Site İçerikleri
+                    </button>
+                    <a href="index.html#stories" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 hover:bg-white/10 hover:text-white transition-colors">
+                        <i class="fa-regular fa-bookmark w-4"></i>
+                        Hikâyeleri Görüntüle
+                    </a>
+                </nav>
+
+                <div class="mt-auto space-y-3 pt-10">
+                    <a href="index.html" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 hover:bg-white/10 hover:text-white transition-colors">
+                        <i class="fa-solid fa-arrow-up-right-from-square w-4"></i>
+                        Siteye dön
+                    </a>
+                    <button id="signOutButton" type="button" class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 hover:bg-white/10 hover:text-white transition-colors text-left">
+                        <i class="fa-solid fa-arrow-right-from-bracket w-4"></i>
+                        Çıkış Yap
+                    </button>
+                </div>
+            </aside>
+
+            <div id="messages" class="min-w-0 px-4 py-6 md:px-8 lg:px-10 lg:py-9">
+                <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+                    <div>
+                        <p class="text-xs tracking-[0.22em] uppercase text-[#D4A373]">Genel Bakış</p>
+                        <h1 class="font-serif text-4xl md:text-5xl mt-1">Gelen Notlar</h1>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="w-9 h-9 rounded-full bg-[#F3E8DF] text-[#D4A373] flex items-center justify-center">
+                            <i class="fa-regular fa-user"></i>
+                        </span>
+                        <div class="min-w-0">
+                            <p class="text-xs text-[#8C857B]">Yönetici</p>
+                            <p id="adminUserLabel" class="text-sm font-medium text-[#2B2A2A] truncate">Yönetici hesabı</p>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <article class="glass-card rounded-2xl p-5 md:p-6">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-[#8C857B]">Toplam not</p>
+                            <span class="w-10 h-10 rounded-xl bg-[#F3E8DF] text-[#D4A373] flex items-center justify-center"><i class="fa-regular fa-envelope"></i></span>
+                        </div>
+                        <p id="totalNotesCount" class="font-serif text-4xl mt-3">—</p>
+                        <p class="text-xs text-[#8C857B] mt-1">Ziyaretçilerden gelen mesajlar</p>
+                    </article>
+                    <article class="glass-card rounded-2xl p-5 md:p-6">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm text-[#8C857B]">Listelenen not</p>
+                            <span class="w-10 h-10 rounded-xl bg-rose-50 text-rose-400 flex items-center justify-center"><i class="fa-solid fa-list"></i></span>
+                        </div>
+                        <p id="visibleNotesCount" class="font-serif text-4xl mt-3">0</p>
+                        <p class="text-xs text-[#8C857B] mt-1">Arama ve yükleme durumuna göre</p>
+                    </article>
+                </div>
+
+                <section class="glass-card rounded-2xl p-4 md:p-5 mb-5">
+                    <label for="noteSearch" class="sr-only">Notlarda ara</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#A9A197] text-sm"></i>
+                        <input id="noteSearch" type="search" placeholder="İsim veya mesaj içeriğinde ara..." class="w-full rounded-xl border border-[#D4A373]/20 bg-white/70 py-3 pl-11 pr-4 text-sm focus:outline-none focus:border-[#D4A373]">
+                    </div>
+                </section>
+
+                <div class="flex items-center justify-between gap-4 mb-4">
+                    <p id="notesSummary" class="text-sm text-[#8C857B]">Notlar yükleniyor...</p>
+                    <button id="refreshNotesButton" type="button" class="shrink-0 flex items-center gap-2 rounded-xl border border-[#D4A373]/30 bg-white/70 px-4 py-2.5 text-sm text-[#8C857B] hover:bg-white transition-colors">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span class="hidden sm:inline">Yenile</span>
+                    </button>
+                </div>
+                <div id="notesList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+                <p id="notesStatus" class="py-6 text-center text-sm text-[#8C857B]" role="status" aria-live="polite"></p>
+                <button id="loadMoreButton" type="button" class="hidden mx-auto mt-4 px-6 py-3 rounded-full border border-[#D4A373]/40 text-sm text-[#8C857B] hover:bg-white transition-colors">Daha Fazla Yükle</button>
+            </div>
+
+            <div id="contentPanel" class="hidden min-w-0 px-4 py-6 md:px-8 lg:px-10 lg:py-9">
+                <header class="mb-8">
+                    <p class="text-xs tracking-[0.22em] uppercase text-[#D4A373]">Kodsuz Düzenleme</p>
+                    <h1 class="font-serif text-4xl md:text-5xl mt-1">Site İçerikleri</h1>
+                    <p class="mt-2 max-w-2xl text-sm text-[#8C857B]">Fotoğrafları ve metinleri formlarla yönetin. Değişiklikler kaydedildiğinde sitede yayınlanır.</p>
+                </header>
+
+                <section class="glass-card rounded-2xl p-4 md:p-5 mb-5">
+                    <label for="contentTypeSelect" class="mb-2 block text-sm font-medium text-[#5F5A53]">Düzenlenecek bölüm</label>
+                    <select id="contentTypeSelect" class="w-full rounded-xl border border-[#D4A373]/25 bg-white/80 px-4 py-3 text-sm focus:outline-none focus:border-[#D4A373]">
+                        <option value="gallery">Anların Estetiği — fotoğraflar ve sözler</option>
+                        <option value="favorites">Favoriler — başlıklar ve açıklamalar</option>
+                        <option value="music">Müzik — şarkı ve YouTube Music bağlantısı</option>
+                        <option value="inspiration_cards">İlham kartları — kart başlıkları ve sözleri</option>
+                        <option value="site_texts">Site metinleri — bölüm başlıkları ve açıklamalar</option>
+                    </select>
+                </section>
+
+                <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.8fr)] gap-5 items-start">
+                    <section class="glass-card rounded-2xl p-4 md:p-5">
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <div>
+                                <h2 id="contentListTitle" class="font-serif text-2xl">İçerikler</h2>
+                                <p id="contentListHint" class="mt-1 text-xs text-[#8C857B]"></p>
+                            </div>
+                            <button id="addContentItemButton" type="button" class="shrink-0 rounded-xl bg-[#D4A373] px-4 py-2.5 text-sm font-medium text-white hover:bg-[#c59464] transition-colors">Yeni ekle</button>
+                        </div>
+                        <div id="contentItems" class="space-y-3"></div>
+                        <p id="contentStatus" class="mt-4 min-h-5 text-sm text-[#8C857B]" role="status" aria-live="polite"></p>
+                    </section>
+
+                    <section id="contentEditorCard" class="hidden glass-card rounded-2xl p-4 md:p-5">
+                        <h2 id="contentEditorTitle" class="mb-4 font-serif text-2xl">İçerik ekle</h2>
+                        <form id="contentForm" class="space-y-3">
+                            <div id="contentFields" class="space-y-3"></div>
+                            <div class="flex gap-2 pt-2">
+                                <button type="submit" id="saveContentItemButton" class="flex-1 rounded-xl bg-[#D4A373] px-4 py-3 text-sm font-medium text-white hover:bg-[#c59464] transition-colors">Kaydet</button>
+                                <button type="button" id="cancelContentEditButton" class="rounded-xl border border-[#D4A373]/30 px-4 py-3 text-sm text-[#8C857B] hover:bg-white/70 transition-colors">Vazgeç</button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script>
+        const config = window.SUPABASE_CONFIG;
+        const setupStatus = document.getElementById('setupStatus');
+        const loginPanel = document.getElementById('loginPanel');
+        const notesPanel = document.getElementById('notesPanel');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatus = document.getElementById('loginStatus');
+        const notesList = document.getElementById('notesList');
+        const notesStatus = document.getElementById('notesStatus');
+        const notesSummary = document.getElementById('notesSummary');
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        const pageSize = 50;
+        let nextOffset = 0;
+        let adminClient = null;
+        let totalNotesCount = 0;
+
+        function showLoginMessage(message) {
+            loginStatus.textContent = message;
+        }
+
+        function formatDate(value) {
+            return new Intl.DateTimeFormat('tr-TR', {
+                dateStyle: 'medium',
+                timeStyle: 'short'
+            }).format(new Date(value));
+        }
+
+        function appendNote(note) {
+            const card = document.createElement('article');
+            card.className = 'note-card glass-card rounded-2xl p-5 md:p-6';
+            card.dataset.searchText = `${note.author} ${note.content}`.toLocaleLowerCase('tr-TR');
+
+            const header = document.createElement('div');
+            header.className = 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-3';
+
+            const author = document.createElement('h2');
+            author.className = 'font-serif text-xl text-[#2B2A2A]';
+            author.textContent = note.author;
+
+            const date = document.createElement('time');
+            date.className = 'text-xs text-[#8C857B]';
+            date.dateTime = note.created_at;
+            date.textContent = formatDate(note.created_at);
+
+            const content = document.createElement('p');
+            content.className = 'text-sm text-[#5F5A53] leading-relaxed whitespace-pre-wrap break-words';
+            content.textContent = note.content;
+
+            header.append(author, date);
+            card.append(header, content);
+            notesList.appendChild(card);
+        }
+
+        async function loadNotes(reset = false) {
+            if (reset) {
+                nextOffset = 0;
+                notesList.replaceChildren();
+            }
+
+            loadMoreButton.disabled = true;
+            notesStatus.textContent = 'Notlar yükleniyor...';
+
+            const { data, error, count } = await adminClient
+                .from('site_notes')
+                .select('id, author, content, created_at', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(nextOffset, nextOffset + pageSize - 1);
+
+            if (error) {
+                console.error('Notlar alınamadı:', error);
+                notesStatus.textContent = 'Notlar yüklenemedi. Supabase tablo ve erişim kurallarını kontrol edin.';
+                loadMoreButton.disabled = false;
+                return;
+            }
+
+            data.forEach(appendNote);
+            nextOffset += data.length;
+            totalNotesCount = count ?? nextOffset;
+            document.getElementById('totalNotesCount').textContent = String(totalNotesCount);
+            notesSummary.textContent = `${nextOffset} / ${totalNotesCount} not yüklendi`;
+            notesStatus.textContent = data.length === 0 && nextOffset === 0 ? 'Henüz gönderilmiş not yok.' : '';
+            loadMoreButton.classList.toggle('hidden', data.length < pageSize);
+            loadMoreButton.disabled = false;
+            filterNotes();
+        }
+
+        function filterNotes() {
+            const query = document.getElementById('noteSearch').value.trim().toLocaleLowerCase('tr-TR');
+            const cards = [...notesList.querySelectorAll('.note-card')];
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const matches = card.dataset.searchText.includes(query);
+                card.classList.toggle('hidden', !matches);
+                if (matches) visibleCount += 1;
+            });
+
+            document.getElementById('visibleNotesCount').textContent = String(visibleCount);
+            if (cards.length > 0 && visibleCount === 0) {
+                notesStatus.textContent = 'Aramayla eşleşen not bulunamadı.';
+            } else if (cards.length > 0) {
+                notesStatus.textContent = '';
+            }
+        }
+
+        const contentDefinitions = {
+            gallery: {
+                title: 'Anların Estetiği',
+                hint: 'Fotoğraf, kategori ve kartın arka yüzündeki sözü düzenleyin.',
+                fields: [
+                    { name: 'category', label: 'Kategori', type: 'select', options: [['kahve', 'Kahve Molası'], ['yol', 'Yolun Ritmi'], ['ilham', 'İlham Köşesi']] },
+                    { name: 'image_file', label: 'Fotoğraf yükle (JPG, PNG, WebP; en fazla 5 MB)', type: 'file' },
+                    { name: 'alt', label: 'Fotoğraf açıklaması', type: 'text', required: true, maxLength: 180 },
+                    { name: 'caption', label: 'Kartın ön yüzündeki kısa yazı', type: 'text', required: true, maxLength: 120 },
+                    { name: 'quote', label: 'Kartın arka yüzündeki söz', type: 'textarea', required: true, maxLength: 400 }
+                ],
+                itemTitle: item => item.caption || item.alt || 'Fotoğraf'
+            },
+            favorites: {
+                title: 'Favoriler',
+                hint: 'Favori kartlarının küçük başlığını, adını ve açıklamasını düzenleyin.',
+                fields: [
+                    { name: 'label', label: 'Kart etiketi', type: 'text', required: true, maxLength: 60 },
+                    { name: 'title', label: 'Başlık', type: 'text', required: true, maxLength: 100 },
+                    { name: 'description', label: 'Açıklama', type: 'textarea', required: true, maxLength: 300 },
+                    { name: 'icon', label: 'Kart simgesi', type: 'select', options: [['fa-solid fa-seedling', 'Yaprak'], ['fa-solid fa-mug-hot', 'Kahve'], ['fa-solid fa-compass', 'Pusula'], ['fa-solid fa-heart', 'Kalp'], ['fa-solid fa-star', 'Yıldız']] }
+                ],
+                itemTitle: item => item.title || item.label || 'Favori'
+            },
+            music: {
+                title: 'Müzik',
+                hint: 'Şarkı adını ve YouTube Music bağlantısını düzenleyin.',
+                fields: [
+                    { name: 'title', label: 'Şarkı adı ve sanatçı', type: 'text', required: true, maxLength: 140 },
+                    { name: 'url', label: 'YouTube Music bağlantısı', type: 'url', required: true, maxLength: 500 }
+                ],
+                itemTitle: item => item.title || 'Şarkı'
+            },
+            inspiration_cards: {
+                title: 'İlham Kartları',
+                hint: 'Özel Notlar bölümündeki kart başlıklarını ve arka yüz sözlerini düzenleyin.',
+                fields: [
+                    { name: 'title', label: 'Kart başlığı', type: 'text', required: true, maxLength: 100 },
+                    { name: 'category', label: 'Kart teması', type: 'text', required: true, maxLength: 50 },
+                    { name: 'quote', label: 'Arka yüz sözü', type: 'textarea', required: true, maxLength: 400 },
+                    { name: 'attribution', label: 'Sözün altındaki imza', type: 'text', required: true, maxLength: 80 },
+                    { name: 'icon', label: 'Kart simgesi', type: 'select', options: [['fa-solid fa-sparkles', 'Işıltı'], ['fa-solid fa-mug-hot', 'Kahve'], ['fa-solid fa-heart', 'Kalp'], ['fa-solid fa-sun', 'Güneş'], ['fa-solid fa-star', 'Yıldız']] }
+                ],
+                itemTitle: item => item.title || 'İlham kartı'
+            },
+            site_texts: {
+                title: 'Site Metinleri',
+                hint: 'Bölüm başlıklarını ve kısa açıklamalarını düzenleyin.',
+                fields: [
+                    { name: 'section', label: 'Site bölümü', type: 'select', options: [['about', 'Giriş bölümü'], ['notes', 'Özel Notlar'], ['stories', 'Topluluk Hikâyeleri'], ['gallery', 'Anların Estetiği'], ['favorites', 'Favoriler & Müzik'], ['daily', 'Günün Tebessümü']] },
+                    { name: 'label', label: 'Üst başlık', type: 'text', required: true, maxLength: 100 },
+                    { name: 'title', label: 'Bölüm başlığı', type: 'text', required: true, maxLength: 140 },
+                    { name: 'description', label: 'Açıklama', type: 'textarea', required: true, maxLength: 400 }
+                ],
+                itemTitle: item => item.title || item.section || 'Bölüm metni'
+            }
+        };
+        const contentKeys = Object.keys(contentDefinitions);
+        const contentTypeSelect = document.getElementById('contentTypeSelect');
+        const contentItems = document.getElementById('contentItems');
+        const contentStatus = document.getElementById('contentStatus');
+        const contentEditorCard = document.getElementById('contentEditorCard');
+        const contentForm = document.getElementById('contentForm');
+        let managedContent = {};
+        let editingContentId = null;
+
+        function setContentStatus(message, isError = false) {
+            contentStatus.textContent = message;
+            contentStatus.classList.toggle('text-rose-700', isError);
+        }
+
+        function extractDefaultContent(html) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const result = { gallery: [], favorites: [], music: [], inspiration_cards: [], site_texts: [] };
+
+            doc.querySelectorAll('#gallery [data-gallery-category]').forEach((card, index) => {
+                const image = card.querySelector('img');
+                const quote = card.querySelector('.rotate-y-180 p');
+                if (!image || !quote) return;
+                result.gallery.push({
+                    id: `gallery-${index + 1}`,
+                    category: card.dataset.galleryCategory,
+                    image_url: image.getAttribute('src') || '',
+                    alt: image.getAttribute('alt') || '',
+                    caption: card.querySelector('.p-5 p')?.textContent.trim() || '',
+                    quote: quote.textContent.trim().replace(/^["“]|["”]$/g, '')
+                });
+            });
+
+            doc.querySelectorAll('#notesContainer > div').forEach((card, index) => {
+                const back = card.querySelector('.rotate-y-180');
+                const heading = card.querySelector('h3');
+                const quote = back?.querySelector('p');
+                if (!heading || !quote) return;
+                result.inspiration_cards.push({
+                    id: `inspiration-${index + 1}`,
+                    title: heading.textContent.trim(),
+                    category: card.querySelector('.font-mono')?.textContent.replace(/^\d+\s*\/\s*/, '').trim() || 'İlham',
+                    quote: quote.textContent.trim().replace(/^["“]|["”]$/g, ''),
+                    attribution: back.querySelector('span')?.textContent.trim().replace(/^—\s*/, '') || 'Beyza’dan Bir Not',
+                    icon: card.querySelector('.text-roseGold i')?.className || 'fa-solid fa-sparkles'
+                });
+            });
+
+            doc.querySelectorAll('#favorites .grid > div:first-child > div').forEach((card, index) => {
+                result.favorites.push({
+                    id: `favorite-${index + 1}`,
+                    label: card.querySelector('.text-xs')?.textContent.trim() || '',
+                    title: card.querySelector('h4')?.textContent.trim() || '',
+                    description: card.querySelector('p')?.textContent.trim() || '',
+                    icon: card.querySelector('i')?.className || 'fa-solid fa-heart'
+                });
+            });
+
+            doc.querySelectorAll('#favorites a[href*="music.youtube.com"]').forEach((link, index) => {
+                result.music.push({
+                    id: `music-${index + 1}`,
+                    title: link.closest('.flex.flex-col')?.querySelector('p')?.textContent.trim() || '',
+                    url: link.getAttribute('href') || ''
+                });
+            });
+
+            const textSections = [
+                ['about', '#about', 'Giriş bölümü'],
+                ['notes', '#notes', 'Özel Notlar'],
+                ['stories', '#stories', 'Topluluk Hikâyeleri'],
+                ['gallery', '#gallery', 'Anların Estetiği'],
+                ['favorites', '#favorites', 'Favoriler & Müzik']
+            ];
+            textSections.forEach(([section, selector, fallbackLabel]) => {
+                const sectionElement = doc.querySelector(selector);
+                const heading = sectionElement?.querySelector('h1, h2');
+                const description = sectionElement?.querySelector('p');
+                if (!heading || !description) return;
+                const label = sectionElement.querySelector('span')?.textContent.trim() || fallbackLabel;
+                result.site_texts.push({
+                    id: `text-${section}`,
+                    section,
+                    label,
+                    title: heading.textContent.trim().replace(/\s+/g, ' '),
+                    description: description.textContent.trim()
+                });
+            });
+            const dailyHeading = [...doc.querySelectorAll('h2')].find(heading => heading.textContent.trim() === 'Günün Tebessümü');
+            if (dailyHeading) {
+                result.site_texts.push({
+                    id: 'text-daily',
+                    section: 'daily',
+                    label: 'GÜNÜN TEBESSÜMÜ',
+                    title: dailyHeading.textContent.trim(),
+                    description: dailyHeading.parentElement.querySelector('p')?.textContent.trim() || ''
+                });
+            }
+            return result;
+        }
+
+        async function saveContentCategory(category) {
+            const { data: authData, error: authError } = await adminClient.auth.getUser();
+            if (authError) throw authError;
+            if (!authData.user) throw new Error('Yönetici oturumu sona ermiş. Yeniden giriş yapın.');
+            const { error } = await adminClient
+                .from('site_content')
+                .upsert({
+                    content_key: category,
+                    content_value: managedContent[category],
+                    updated_by: authData.user.id,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'content_key' });
+            if (error) throw error;
+        }
+
+        async function loadManagedContent() {
+            setContentStatus('İçerikler yükleniyor...');
+            const { data, error } = await adminClient
+                .from('site_content')
+                .select('content_key, content_value')
+                .in('content_key', contentKeys);
+            if (error) throw error;
+
+            managedContent = Object.fromEntries(data.map(row => [row.content_key, row.content_value]));
+            const missingKeys = contentKeys.filter(key => !Object.hasOwn(managedContent, key));
+            if (missingKeys.length) {
+                const response = await fetch('index.html', { cache: 'no-store' });
+                if (!response.ok) throw new Error('Mevcut site içerikleri başlangıç verisi olarak alınamadı.');
+                const defaults = extractDefaultContent(await response.text());
+                for (const key of missingKeys) {
+                    managedContent[key] = defaults[key];
+                    await saveContentCategory(key);
+                }
+            }
+            renderContentItems();
+            setContentStatus('Mevcut site içerikleri panele aktarıldı. Buradaki düzenlemeler Supabase’e kaydedilir.');
+        }
+
+        function closeContentEditor() {
+            contentForm.reset();
+            editingContentId = null;
+            contentEditorCard.classList.add('hidden');
+        }
+
+        function renderContentItems() {
+            const type = contentTypeSelect.value;
+            const definition = contentDefinitions[type];
+            const entries = managedContent[type] || [];
+            document.getElementById('contentListTitle').textContent = definition.title;
+            document.getElementById('contentListHint').textContent = definition.hint;
+            contentItems.replaceChildren();
+
+            if (!entries.length) {
+                const empty = document.createElement('p');
+                empty.className = 'rounded-xl border border-dashed border-[#D4A373]/30 p-5 text-center text-sm text-[#8C857B]';
+                empty.textContent = 'Bu bölümde henüz içerik yok. “Yeni ekle” ile başlayın.';
+                contentItems.appendChild(empty);
+                return;
+            }
+
+            entries.forEach(entry => {
+                const row = document.createElement('article');
+                row.className = 'flex items-center gap-3 rounded-xl border border-[#D4A373]/15 bg-white/55 p-3';
+                if (type === 'gallery' && entry.image_url) {
+                    const image = document.createElement('img');
+                    image.src = entry.image_url;
+                    image.alt = '';
+                    image.className = 'h-14 w-14 shrink-0 rounded-lg border border-[#D4A373]/20 object-cover';
+                    row.appendChild(image);
+                }
+                const details = document.createElement('div');
+                details.className = 'min-w-0 flex-1';
+                const title = document.createElement('p');
+                title.className = 'truncate text-sm font-medium text-[#2B2A2A]';
+                title.textContent = definition.itemTitle(entry);
+                const subtitle = document.createElement('p');
+                subtitle.className = 'mt-1 truncate text-xs text-[#8C857B]';
+                subtitle.textContent = type === 'gallery'
+                    ? `${entry.category} · ${entry.quote}`
+                    : (entry.description || entry.quote || entry.url || entry.label || '');
+                details.append(title, subtitle);
+                row.appendChild(details);
+
+                const edit = document.createElement('button');
+                edit.type = 'button';
+                edit.className = 'rounded-lg border border-[#D4A373]/25 px-3 py-2 text-xs text-[#8C857B] hover:bg-white';
+                edit.textContent = 'Düzenle';
+                edit.addEventListener('click', () => openContentEditor(entry));
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'rounded-lg border border-rose-200 px-3 py-2 text-xs text-rose-700 hover:bg-rose-50';
+                remove.textContent = 'Sil';
+                remove.addEventListener('click', () => deleteContentItem(entry.id));
+                row.append(edit, remove);
+                contentItems.appendChild(row);
+            });
+        }
+
+        function openContentEditor(entry = null) {
+            editingContentId = entry?.id || null;
+            const type = contentTypeSelect.value;
+            const fields = document.getElementById('contentFields');
+            fields.replaceChildren();
+            document.getElementById('contentEditorTitle').textContent = entry ? 'İçeriği düzenle' : 'Yeni içerik ekle';
+
+            contentDefinitions[type].fields.forEach(field => {
+                const wrapper = document.createElement('div');
+                const label = document.createElement('label');
+                label.className = 'mb-1 block text-xs font-medium text-[#5F5A53]';
+                label.textContent = field.label;
+                label.htmlFor = `contentField-${field.name}`;
+                wrapper.appendChild(label);
+                let input;
+                if (field.type === 'textarea') {
+                    input = document.createElement('textarea');
+                    input.rows = 3;
+                    input.className = 'w-full rounded-xl border border-[#D4A373]/25 bg-white/80 px-3 py-2.5 text-sm focus:outline-none focus:border-[#D4A373]';
+                } else if (field.type === 'select') {
+                    input = document.createElement('select');
+                    input.className = 'w-full rounded-xl border border-[#D4A373]/25 bg-white/80 px-3 py-2.5 text-sm focus:outline-none focus:border-[#D4A373]';
+                    field.options.forEach(([value, text]) => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = text;
+                        input.appendChild(option);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = field.type;
+                    input.className = 'w-full rounded-xl border border-[#D4A373]/25 bg-white/80 px-3 py-2.5 text-sm focus:outline-none focus:border-[#D4A373]';
+                }
+                input.id = `contentField-${field.name}`;
+                input.name = field.name;
+                input.required = Boolean(field.required) || (field.type === 'file' && !entry?.image_url);
+                if (field.maxLength) input.maxLength = field.maxLength;
+                if (field.type !== 'file') input.value = entry?.[field.name] || '';
+                else {
+                    input.accept = 'image/jpeg,image/png,image/webp';
+                    input.required = !entry?.image_url;
+                }
+                wrapper.appendChild(input);
+                fields.appendChild(wrapper);
+            });
+            contentEditorCard.classList.remove('hidden');
+            contentEditorCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        async function uploadSiteImage(file) {
+            if (!file || file.size === 0) return null;
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+                throw new Error('Fotoğraf JPG, PNG veya WebP olmalı ve 5 MB boyutunu aşmamalı.');
+            }
+            const extension = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+            const path = `gallery/${crypto.randomUUID()}.${extension}`;
+            const { error } = await adminClient.storage.from('site-content').upload(path, file, {
+                cacheControl: '3600',
+                contentType: file.type,
+                upsert: false
+            });
+            if (error) throw error;
+            const { data } = adminClient.storage.from('site-content').getPublicUrl(path);
+            return data.publicUrl;
+        }
+
+        async function deleteContentItem(id) {
+            const type = contentTypeSelect.value;
+            const previousContent = managedContent[type];
+            managedContent[type] = previousContent.filter(entry => entry.id !== id);
+            try {
+                await saveContentCategory(type);
+                renderContentItems();
+                setContentStatus('İçerik silindi ve sitede güncellendi.');
+            } catch (error) {
+                managedContent[type] = previousContent;
+                console.error('İçerik silinemedi:', error);
+                setContentStatus(`İçerik silinemedi: ${error.message}`, true);
+            }
+        }
+
+        contentTypeSelect.addEventListener('change', () => {
+            closeContentEditor();
+            renderContentItems();
+        });
+        document.getElementById('addContentItemButton').addEventListener('click', () => openContentEditor());
+        document.getElementById('cancelContentEditButton').addEventListener('click', closeContentEditor);
+        contentForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const type = contentTypeSelect.value;
+            const saveButton = document.getElementById('saveContentItemButton');
+            saveButton.disabled = true;
+            setContentStatus('İçerik kaydediliyor...');
+            const formData = new FormData(contentForm);
+            const entry = {};
+            const previousContent = managedContent[type];
+            contentDefinitions[type].fields.forEach(field => {
+                if (field.type !== 'file') entry[field.name] = String(formData.get(field.name) || '').trim();
+            });
+            try {
+                if (type === 'gallery') {
+                    const existingEntry = (managedContent.gallery || []).find(item => item.id === editingContentId);
+                    entry.image_url = existingEntry?.image_url || '';
+                    const uploadUrl = await uploadSiteImage(formData.get('image_file'));
+                    if (uploadUrl) entry.image_url = uploadUrl;
+                    if (!entry.image_url) throw new Error('Fotoğraf adresi girin veya fotoğraf yükleyin.');
+                }
+                if (type === 'music') {
+                    const musicUrl = new URL(entry.url);
+                    if (musicUrl.protocol !== 'https:' || musicUrl.hostname !== 'music.youtube.com') {
+                        throw new Error('Güvenlik için yalnızca music.youtube.com bağlantısı kullanın.');
+                    }
+                }
+                const entries = [...(managedContent[type] || [])];
+                const updated = { ...entry, id: editingContentId || crypto.randomUUID() };
+                const existingIndex = entries.findIndex(item => item.id === editingContentId);
+                if (existingIndex >= 0) entries[existingIndex] = updated;
+                else entries.push(updated);
+                managedContent[type] = entries;
+                await saveContentCategory(type);
+                renderContentItems();
+                closeContentEditor();
+                setContentStatus('Kaydedildi. Değişiklikler sitede yayınlandı.');
+            } catch (error) {
+                managedContent[type] = previousContent;
+                renderContentItems();
+                console.error('İçerik kaydedilemedi:', error);
+                setContentStatus(`İçerik kaydedilemedi: ${error.message}`, true);
+            } finally {
+                saveButton.disabled = false;
+            }
+        });
+
+        document.querySelectorAll('[data-admin-section-target]').forEach(button => {
+            button.addEventListener('click', async () => {
+                document.getElementById('messages').classList.add('hidden');
+                document.getElementById('contentPanel').classList.remove('hidden');
+                document.querySelectorAll('.admin-sidebar [data-admin-section-target], .admin-sidebar a[href="#messages"]').forEach(nav => {
+                    nav.classList.remove('admin-nav-active');
+                    nav.classList.add('text-white/65');
+                });
+                button.classList.add('admin-nav-active');
+                button.classList.remove('text-white/65');
+                if (!contentKeys.every(key => Object.hasOwn(managedContent, key))) {
+                    try {
+                        await loadManagedContent();
+                    } catch (error) {
+                        console.error('Site içerikleri yüklenemedi:', error);
+                        setContentStatus(`Site içerikleri yüklenemedi: ${error.message}`, true);
+                    }
+                }
+            });
+        });
+        document.querySelector('.admin-sidebar a[href="#messages"]').addEventListener('click', event => {
+            event.preventDefault();
+            document.getElementById('contentPanel').classList.add('hidden');
+            document.getElementById('messages').classList.remove('hidden');
+            document.querySelectorAll('.admin-sidebar [data-admin-section-target], .admin-sidebar a[href="#messages"]').forEach(nav => {
+                nav.classList.remove('admin-nav-active');
+                nav.classList.add('text-white/65');
+            });
+            event.currentTarget.classList.add('admin-nav-active');
+            event.currentTarget.classList.remove('text-white/65');
+        });
+
+        async function showAdmin(user) {
+            if (!user?.email || user.email.toLowerCase() !== config.adminEmail.toLowerCase()) {
+                await adminClient.auth.signOut();
+                loginPanel.classList.remove('hidden');
+                notesPanel.classList.add('hidden');
+                notesPanel.classList.remove('notes-panel-visible');
+                showLoginMessage('Bu hesap yönetici paneline erişim yetkisine sahip değil.');
+                return;
+            }
+
+            loginPanel.classList.add('hidden');
+            notesPanel.classList.remove('hidden');
+            notesPanel.classList.add('notes-panel-visible');
+            document.getElementById('adminUserLabel').textContent = user.email;
+            await loadNotes(true);
+        }
+
+        document.getElementById('adminEmail').value = config.adminEmail;
+
+        if (!config.url || !config.anonKey || !window.supabase) {
+            setupStatus.textContent = 'Panel henüz Supabase projesine bağlanmadı. Önce supabase-config.js dosyasına Project URL ve anon/publishable key ekleyin, ardından supabase-setup.sql dosyasını Supabase SQL Editor’da çalıştırın.';
+            setupStatus.classList.remove('hidden');
+            document.getElementById('loginButton').disabled = true;
+            document.getElementById('loginButton').classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+            adminClient = window.supabase.createClient(config.url, config.anonKey);
+            adminClient.auth.getSession().then(({ data, error }) => {
+                if (error) {
+                    showLoginMessage('Oturum kontrol edilemedi. Lütfen tekrar giriş yapın.');
+                    console.error('Oturum kontrol edilemedi:', error);
+                    return;
+                }
+                if (data.session) showAdmin(data.session.user);
+            });
+        }
+
+        loginForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!adminClient) return;
+
+            const loginButton = document.getElementById('loginButton');
+            loginButton.disabled = true;
+            showLoginMessage('Giriş yapılıyor...');
+
+            const { data, error } = await adminClient.auth.signInWithPassword({
+                email: config.adminEmail,
+                password: document.getElementById('adminPassword').value
+            });
+
+            loginButton.disabled = false;
+            if (error) {
+                console.error('Yönetici girişi başarısız:', error);
+                showLoginMessage('Giriş yapılamadı. E-posta ve şifreyi kontrol edin.');
+                return;
+            }
+
+            await showAdmin(data.user);
+            document.getElementById('adminPassword').value = '';
+        });
+
+        document.getElementById('signOutButton').addEventListener('click', async () => {
+            const { error } = await adminClient.auth.signOut();
+            if (error) {
+                console.error('Oturum kapatılamadı:', error);
+                notesStatus.textContent = 'Çıkış yapılamadı. Lütfen tekrar deneyin.';
+                return;
+            }
+
+            notesPanel.classList.add('hidden');
+            notesPanel.classList.remove('notes-panel-visible');
+            loginPanel.classList.remove('hidden');
+            showLoginMessage('');
+        });
+
+        loadMoreButton.addEventListener('click', () => loadNotes());
+        document.getElementById('noteSearch').addEventListener('input', filterNotes);
+        document.getElementById('refreshNotesButton').addEventListener('click', () => loadNotes(true));
+    </script>
+</body>
+</html>

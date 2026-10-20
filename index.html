@@ -1,0 +1,2863 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beyza Özcan | Kişisel Web Sitesi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rose: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                        },
+                        cream: '#FAF7F2',
+                        champagne: '#F3E8DF',
+                        roseGold: '#D4A373',
+                        charcoal: '#2B2A2A',
+                        warmGray: '#8C857B'
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            overflow-x: clip;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF7F2;
+            color: #2B2A2A;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-theme {
+            background-color: #191716;
+            color: #fff;
+        }
+
+        body.dark-theme ::-webkit-scrollbar-track {
+            background: #191716;
+        }
+
+        body.dark-theme .glass-card {
+            background: rgba(37, 34, 32, 0.88);
+            border-color: rgba(212, 163, 115, 0.24);
+        }
+
+        body.dark-theme [class*="bg-white/"] {
+            background-color: rgba(37, 34, 32, 0.88) !important;
+        }
+
+        body.dark-theme [class~="bg-white"],
+        body.dark-theme [class~="hover:bg-white"]:hover {
+            background-color: #302b28 !important;
+        }
+
+        body.dark-theme [class*="text-charcoal"],
+        body.dark-theme [class*="text-warmGray"] {
+            color: #fff !important;
+        }
+
+        body.dark-theme input,
+        body.dark-theme textarea {
+            color: #fff;
+            background-color: rgba(25, 23, 22, 0.8);
+        }
+
+        body.dark-theme input::placeholder,
+        body.dark-theme textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        body.dark-theme #chatWindow {
+            background-color: #191716;
+        }
+
+        body.dark-theme #chatWindow header,
+        body.dark-theme #chatWindow form {
+            background-color: #252220;
+        }
+
+        body.dark-theme #chatWindow [class*="bg-white/"] {
+            background-color: rgba(48, 43, 40, 0.9) !important;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF7F2;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4A373;
+            border-radius: 4px;
+        }
+
+        /* Canvas Particle Background */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Card Flip Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 163, 115, 0.2);
+        }
+
+        .glass-card-hover {
+            transition: all 0.4s ease;
+        }
+        .glass-card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -10px rgba(212, 163, 115, 0.25);
+            border-color: rgba(212, 163, 115, 0.4);
+        }
+
+        /* Subtle Audio Visualizer Animation */
+        .bar {
+            transition: height 0.15s ease;
+        }
+
+        /* Sparkle Animation */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .glow-effect {
+            animation: pulseGlow 4s infinite ease-in-out;
+        }
+
+        .gallery-filter[aria-pressed="true"] {
+            background-color: #D4A373;
+            color: #fff;
+            border-color: #D4A373;
+        }
+
+        @keyframes smileFloatIn {
+            0% {
+                opacity: 0;
+                transform: translateY(26px) scale(0.94);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes smileFloatOut {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-18px) scale(0.98);
+            }
+        }
+
+        .smile-overlay-visible {
+            animation: smileFloatIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .smile-overlay-hiding {
+            animation: smileFloatOut 0.45s ease forwards;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <!-- Subtle Floating Canvas Background -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-card border-b border-roseGold/10 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="#" class="font-serif text-2xl md:text-3xl font-semibold tracking-wide text-charcoal flex items-center gap-2">
+                <span class="text-roseGold">✨</span> Beyza Özcan
+            </a>
+            
+            <nav class="hidden md:flex gap-6 text-sm font-medium tracking-wider text-charcoal/80">
+                <a href="#about" class="hover:text-roseGold transition-colors">HAKKINDA</a>
+                <a href="#notes" class="hover:text-roseGold transition-colors">ÖZEL NOTLAR</a>
+                <a href="#stories" class="hover:text-roseGold transition-colors">HİKÂYELER</a>
+                <a href="#gallery" class="hover:text-roseGold transition-colors">GALERİ</a>
+                <a href="#favorites" class="hover:text-roseGold transition-colors">FAVORİLER</a>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <button id="accountButton" type="button" class="bg-white/70 hover:bg-white text-charcoal border border-roseGold/30 px-3 py-2 rounded-full text-xs md:text-sm font-medium transition-all flex items-center gap-2" aria-label="Giriş yap veya hesap bilgilerini aç">
+                    <i class="fa-regular fa-user text-roseGold"></i>
+                    <span id="accountButtonLabel">Giriş</span>
+                </button>
+                <button id="smileQuickBtn" onclick="triggerSmile()" class="bg-roseGold/10 hover:bg-roseGold/20 text-roseGold border border-roseGold/30 px-3 md:px-4 py-2 rounded-full text-xs md:text-sm font-medium transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span class="hidden sm:inline">Günün Tebessümü</span>
+                    <span class="sm:hidden">Tebessüm</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="smileOverlay" onclick="dismissSmile()" class="absolute top-full left-0 right-0 z-[70] hidden items-start justify-center px-4 pt-3 pointer-events-none">
+            <div class="relative max-w-2xl w-full rounded-2xl border border-roseGold/30 bg-white/90 backdrop-blur-xl px-5 py-4 md:px-8 shadow-[0_15px_45px_rgba(212,163,115,0.18)] pointer-events-auto cursor-pointer">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-rose-100 text-roseGold flex items-center justify-center shadow-md shadow-roseGold/20">
+                    <i class="fa-solid fa-sparkles text-sm"></i>
+                </div>
+                <p id="smileOverlayText" class="font-serif italic text-xl md:text-2xl leading-relaxed text-charcoal text-center mt-2">
+                    "Bugün harika şeylerin başlangıcı olabilir."
+                </p>
+            </div>
+        </div>
+
+    </header>
+
+    <div id="accountModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-charcoal/30 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
+        <section class="glass-card relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 md:p-8 shadow-xl">
+            <button id="closeAccountModal" type="button" class="absolute top-4 right-4 w-9 h-9 rounded-full text-warmGray hover:bg-rose-100 hover:text-roseGold transition-colors" aria-label="Kapat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <p id="accountEyebrow" class="text-xs tracking-[0.2em] uppercase text-roseGold text-center">Hikâye Paylaşımı</p>
+            <h2 id="accountModalTitle" class="font-serif text-3xl text-charcoal text-center mt-2 mb-6">Hesabına Giriş Yap</h2>
+
+            <div id="accountSignedIn" class="hidden text-center space-y-4">
+                <p id="signedInLabel" class="text-sm text-warmGray"></p>
+                <div class="grid grid-cols-1 sm:grid-cols-[180px_minmax(0,1fr)] gap-5 text-left">
+                    <nav class="flex sm:flex-col gap-2" aria-label="Hesap bölümleri">
+                        <button type="button" class="account-tab flex-1 sm:flex-none rounded-xl px-4 py-3 text-sm text-left transition-colors" data-account-tab="profile" aria-selected="true">
+                            <i class="fa-regular fa-user w-5 text-roseGold"></i> Profil
+                        </button>
+                        <button type="button" class="account-tab flex-1 sm:flex-none rounded-xl px-4 py-3 text-sm text-left transition-colors" data-account-tab="friends" aria-selected="false">
+                            <i class="fa-solid fa-user-group w-5 text-roseGold"></i> Arkadaşlar
+                            <span id="friendRequestBadge" class="hidden ml-1 rounded-full bg-roseGold px-2 py-0.5 text-xs text-white" aria-label="Bekleyen arkadaşlık isteği sayısı">0</span>
+                        </button>
+                        <button type="button" class="account-tab flex-1 sm:flex-none rounded-xl px-4 py-3 text-sm text-left transition-colors" data-account-tab="settings" aria-selected="false">
+                            <i class="fa-solid fa-gear w-5 text-roseGold"></i> Ayarlar
+                        </button>
+                    </nav>
+
+                    <div class="min-w-0 rounded-2xl border border-roseGold/15 bg-white/45 p-5 md:p-6">
+                        <section class="account-tab-panel space-y-4" data-account-panel="profile">
+                            <div>
+                                <h3 class="font-serif text-2xl text-charcoal">Profilim</h3>
+                                <p class="text-sm text-warmGray mt-1">Kendini toplulukta nasıl tanıtacağını düzenle.</p>
+                            </div>
+                            <form id="profileForm" class="space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                                    <img id="profilePhotoPreview" src="" alt="Profil fotoğrafı önizlemesi" class="hidden w-20 h-20 rounded-full object-cover border-2 border-roseGold/40">
+                                    <div id="profilePhotoPlaceholder" class="w-20 h-20 rounded-full bg-rose-100 text-roseGold flex items-center justify-center text-2xl border-2 border-roseGold/30">
+                                        <i class="fa-regular fa-user"></i>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="profilePhotoInput" class="block text-sm text-warmGray">Profil fotoğrafı</label>
+                                        <input id="profilePhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="block w-full max-w-xs text-sm text-warmGray file:mr-3 file:rounded-full file:border-0 file:bg-roseGold/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-roseGold hover:file:bg-roseGold/20">
+                                        <p class="text-xs text-warmGray">JPG, PNG veya WebP; en fazla 3 MB.</p>
+                                        <button id="uploadProfilePhotoButton" type="button" class="px-4 py-2 rounded-xl border border-roseGold/30 text-charcoal text-sm hover:bg-white transition-colors">Fotoğrafı Yükle</button>
+                                    </div>
+                                </div>
+                                <p id="profilePhotoStatus" class="min-h-5 text-sm text-warmGray" role="status" aria-live="polite"></p>
+                                <div>
+                                    <label for="profileDisplayName" class="block text-sm text-warmGray mb-1">Görünen ad</label>
+                                    <input id="profileDisplayName" type="text" maxlength="60" required autocomplete="name" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                                </div>
+                                <div>
+                                    <label for="profileBio" class="block text-sm text-warmGray mb-1">Hakkımda</label>
+                                    <textarea id="profileBio" rows="3" maxlength="300" placeholder="Kendinden kısaca bahset..." class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm resize-y"></textarea>
+                                </div>
+                                <button id="saveProfileButton" type="submit" class="bg-roseGold text-white px-5 py-3 rounded-xl font-medium text-sm hover:bg-roseGold/90 transition-colors">Profili Kaydet</button>
+                                <p id="profileStatus" class="min-h-5 text-sm text-warmGray" role="status" aria-live="polite"></p>
+                            </form>
+                        </section>
+
+                        <section class="account-tab-panel hidden space-y-4" data-account-panel="friends">
+                            <div>
+                                <h3 class="font-serif text-2xl text-charcoal">Arkadaşlar</h3>
+                                <p class="text-sm text-warmGray mt-1">Üyeleri e-posta adresleriyle bul, arkadaşlık isteği gönder ve gelen istekleri yönet.</p>
+                                <button id="refreshFriendsButton" type="button" class="mt-2 text-xs text-roseGold hover:underline">İstekleri yenile</button>
+                            </div>
+                            <form id="friendSearchForm" class="flex flex-col sm:flex-row gap-2">
+                                <label for="friendSearchInput" class="sr-only">E-posta adresiyle üye bul</label>
+                                <input id="friendSearchInput" type="email" maxlength="254" required autocomplete="email" placeholder="Üyenin e-posta adresi..." class="min-w-0 flex-1 px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                                <button id="friendSearchButton" type="submit" class="px-5 py-3 rounded-xl bg-roseGold text-white text-sm font-medium hover:bg-roseGold/90 transition-colors">E-posta ile bul</button>
+                            </form>
+                            <div>
+                                <h4 class="text-sm font-semibold text-charcoal mb-2">Arama sonuçları</h4>
+                                <div id="friendSearchResults" class="space-y-2"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-charcoal mb-2">Gelen istekler</h4>
+                                <div id="incomingFriendRequests" class="space-y-2"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-charcoal mb-2">Gönderilen istekler</h4>
+                                <div id="outgoingFriendRequests" class="space-y-2"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-charcoal mb-2">Arkadaşlarım</h4>
+                                <div id="friendsList" class="space-y-2"></div>
+                            </div>
+                            <div id="friendsStatus" class="min-h-5 text-sm text-center text-warmGray" role="status" aria-live="polite"></div>
+                        </section>
+
+                        <section class="account-tab-panel hidden space-y-4" data-account-panel="settings">
+                            <div>
+                                <h3 class="font-serif text-2xl text-charcoal">Ayarlar</h3>
+                                <p class="text-sm text-warmGray mt-1">Hesap bilgilerini ve oturumunu yönet.</p>
+                            </div>
+                            <div class="rounded-xl border border-roseGold/20 bg-white/40 px-4 py-4">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="text-sm font-medium text-charcoal">Görünüm</p>
+                                        <p id="themePreferenceLabel" class="text-xs text-warmGray mt-1">Açık tema</p>
+                                    </div>
+                                    <button id="themeToggleButton" type="button" class="shrink-0 px-4 py-2 rounded-full border border-roseGold/30 text-sm text-charcoal hover:bg-white transition-colors" aria-pressed="false">
+                                        <i class="fa-regular fa-moon text-roseGold mr-1"></i> Koyu temayı aç
+                                    </button>
+                                </div>
+                                <p id="themeStatus" class="min-h-5 text-xs text-warmGray mt-2" role="status" aria-live="polite"></p>
+                            </div>
+                            <p id="accountEmailLabel" class="rounded-xl bg-white/60 px-4 py-3 text-sm text-warmGray break-all"></p>
+                            <form id="passwordForm" class="space-y-3">
+                                <label for="currentAccountPassword" class="block text-sm text-warmGray">Mevcut şifre</label>
+                                <input id="currentAccountPassword" type="password" autocomplete="current-password" required placeholder="Mevcut şifren" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                                <label for="newAccountPassword" class="block text-sm text-warmGray">Yeni şifre</label>
+                                <input id="newAccountPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="En az 8 karakter" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                                <button id="changePasswordButton" type="submit" class="px-5 py-3 rounded-xl border border-roseGold/30 text-charcoal text-sm hover:bg-white transition-colors">Şifreyi Güncelle</button>
+                                <p id="settingsStatus" class="min-h-5 text-sm text-warmGray" role="status" aria-live="polite"></p>
+                            </form>
+                            <button id="forgotPasswordButton" type="button" class="text-sm text-roseGold hover:underline">Şifremi unuttum</button>
+                            <form id="passwordRecoveryForm" class="hidden space-y-3">
+                                <p class="text-sm text-warmGray">E-postandaki bağlantıyı açtıktan sonra yeni şifreni belirleyebilirsin.</p>
+                                <label for="recoveryNewPassword" class="block text-sm text-warmGray">Yeni şifre</label>
+                                <input id="recoveryNewPassword" type="password" minlength="8" autocomplete="new-password" required placeholder="En az 8 karakter" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                                <button id="recoveryPasswordButton" type="submit" class="px-5 py-3 rounded-xl border border-roseGold/30 text-charcoal text-sm hover:bg-white transition-colors">Yeni Şifreyi Kaydet</button>
+                                <p id="recoveryStatus" class="min-h-5 text-sm text-warmGray" role="status" aria-live="polite"></p>
+                            </form>
+                            <button id="signOutButton" type="button" class="w-full px-5 py-3 rounded-xl border border-roseGold/30 text-charcoal text-sm hover:bg-white transition-colors">Çıkış Yap</button>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <form id="accountForm" class="space-y-4">
+                <div id="displayNameField" class="hidden">
+                    <label for="accountDisplayName" class="block text-sm text-warmGray mb-1">Görünen adın</label>
+                    <input id="accountDisplayName" type="text" maxlength="60" autocomplete="name" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                </div>
+                <div>
+                    <label for="accountEmail" class="block text-sm text-warmGray mb-1">E-posta</label>
+                    <input id="accountEmail" type="email" required autocomplete="email" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                </div>
+                <div>
+                    <label for="accountPassword" class="block text-sm text-warmGray mb-1">Şifre (en az 8 karakter)</label>
+                    <input id="accountPassword" type="password" minlength="8" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                </div>
+                <div id="confirmPasswordField" class="hidden">
+                    <label for="accountPasswordConfirmation" class="block text-sm text-warmGray mb-1">Şifreyi tekrar yaz</label>
+                    <input id="accountPasswordConfirmation" type="password" minlength="8" autocomplete="new-password" class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm">
+                </div>
+                <button id="accountSubmitButton" type="submit" class="w-full bg-roseGold text-white py-3 rounded-xl font-medium text-sm hover:bg-roseGold/90 transition-colors">Giriş Yap</button>
+                <p id="accountStatus" class="min-h-5 text-sm text-center text-warmGray" role="status" aria-live="polite"></p>
+            </form>
+            <p id="accountModePrompt" class="text-sm text-center text-warmGray mt-4">
+                Hesabın yok mu?
+                <button id="toggleAccountMode" type="button" class="text-roseGold font-medium hover:underline">Kayıt ol</button>
+            </p>
+        </section>
+    </div>
+
+    <section id="chatWindow" class="fixed bottom-24 right-4 z-[60] hidden h-[min(520px,calc(100vh-8rem))] w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-3xl border border-roseGold/25 bg-[#FAF7F2] shadow-[0_20px_70px_rgba(43,42,42,0.22)] flex-col" role="dialog" aria-modal="false" aria-labelledby="chatWindowTitle">
+        <header class="flex items-center justify-between border-b border-roseGold/15 bg-white/70 px-4 py-3">
+            <div class="flex min-w-0 items-center gap-2">
+                <button id="chatBackButton" type="button" class="hidden h-9 w-9 shrink-0 rounded-full text-warmGray hover:bg-rose-100 hover:text-roseGold" aria-label="Sohbet listesine dön">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="min-w-0">
+                    <h2 id="chatWindowTitle" class="truncate font-serif text-xl text-charcoal">Mesajlar</h2>
+                    <p id="chatSubtitle" class="truncate text-xs text-warmGray">Arkadaşlarınla özel sohbet et</p>
+                </div>
+            </div>
+            <button id="closeChatWindow" type="button" class="h-9 w-9 shrink-0 rounded-full text-warmGray hover:bg-rose-100 hover:text-roseGold" aria-label="Sohbet penceresini kapat">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </header>
+        <div id="chatFriendList" class="min-h-0 flex-1 overflow-y-auto p-3"></div>
+        <div id="chatConversation" class="hidden min-h-0 flex-1 flex-col">
+            <div id="chatMessages" class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite"></div>
+            <form id="chatMessageForm" class="flex items-end gap-2 border-t border-roseGold/15 bg-white/50 p-3">
+                <label for="chatMessageInput" class="sr-only">Mesajını yaz</label>
+                <textarea id="chatMessageInput" rows="1" maxlength="2000" required placeholder="Mesaj yaz..." class="max-h-24 min-h-11 flex-1 resize-y rounded-2xl border border-roseGold/20 bg-white/80 px-4 py-3 text-sm focus:outline-none focus:border-roseGold"></textarea>
+                <button id="sendChatMessageButton" type="submit" class="h-11 w-11 shrink-0 rounded-full bg-roseGold text-white hover:bg-roseGold/90 disabled:opacity-50" aria-label="Mesajı gönder">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+        <p id="chatStatus" class="hidden px-4 pb-3 text-xs text-center text-warmGray" role="status" aria-live="polite"></p>
+    </section>
+    <button id="chatBubbleButton" type="button" class="fixed bottom-5 right-5 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-roseGold text-white shadow-lg shadow-roseGold/30 transition-transform hover:-translate-y-1 hover:bg-roseGold/90" aria-label="Özel mesajları aç" aria-expanded="false" aria-controls="chatWindow">
+        <i class="fa-regular fa-comments text-xl"></i>
+        <span id="chatUnreadBadge" class="hidden absolute -right-1 -top-1 min-w-5 h-5 items-center justify-center rounded-full border-2 border-cream bg-roseGold px-1 text-[10px] font-semibold leading-none text-white" aria-live="polite" aria-label="Okunmamış mesaj sayısı">0</span>
+    </button>
+
+    <main class="relative z-10 pt-24 pb-16 px-4 md:px-8 max-w-6xl mx-auto space-y-24">
+
+        <!-- HERO SECTION -->
+        <section id="about" class="min-h-[80vh] flex flex-col justify-center items-center text-center relative pt-12">
+            <!-- Decorative Accent -->
+            <div class="absolute w-72 h-72 bg-rose-200/40 rounded-full blur-3xl -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glow-effect"></div>
+
+            <span class="inline-block px-4 py-1.5 mb-6 text-xs font-semibold tracking-widest text-roseGold uppercase bg-champagne/60 rounded-full border border-roseGold/20">
+                Zarafet &amp; Işıltı
+            </span>
+            
+            <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-normal text-charcoal leading-tight mb-6">
+                Merhaba, Ben <br>
+                <span class="italic font-semibold text-roseGold">Beyza Özcan</span>
+            </h1>
+
+            <p class="font-serif italic text-xl md:text-2xl text-warmGray max-w-2xl leading-relaxed mb-10">
+                "Her detayda bir zarafet, her tebessümde sıcak bir ışıltı saklıdır. Hayatı inceliklerle yaşamayı ve güzel anlar biriktirmeyi seviyorum."
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#notes" class="bg-charcoal text-cream hover:bg-roseGold px-8 py-3.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-charcoal/10 flex items-center gap-2">
+                    <i class="fa-regular fa-envelope"></i> Notları Keşfet
+                </a>
+                <a href="#favorites" class="bg-white/80 hover:bg-white text-charcoal border border-roseGold/30 px-8 py-3.5 rounded-full text-sm font-medium transition-all shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-heart text-roseGold"></i> Favori Anlar
+                </a>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE MEMORY & NOTE BOX -->
+        <section id="notes" class="space-y-8">
+            <div class="text-center space-y-3">
+                <span class="text-xs font-semibold tracking-widest text-roseGold uppercase">ETKİLEŞİMLİ KARTLAR</span>
+                <h2 class="font-serif text-3xl md:text-4xl text-charcoal">Özel Notlar &amp; İlham Kartları</h2>
+                <p class="text-sm text-warmGray max-w-md mx-auto">Kartlara tıklayarak arkalarındaki özel mesajları ve dilekleri çevirebilirsiniz.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="notesContainer">
+                <!-- Note Card 1 -->
+                <div class="perspective-1000 h-64 cursor-pointer group" onclick="flipCard(this)">
+                    <div class="transform-style-3d relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+                        <!-- Front -->
+                        <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden">
+                            <div class="flex justify-between items-center text-roseGold">
+                                <i class="fa-solid fa-sparkles text-xl"></i>
+                                <span class="text-xs font-mono uppercase tracking-wider">01 / Zarafet</span>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="font-serif text-2xl text-charcoal">Işıltılı Düşünceler</h3>
+                                <p class="text-xs text-warmGray mt-2">Kartı çevirmek için tıklayın</p>
+                            </div>
+                            <div class="text-right">
+                                <i class="fa-solid fa-arrow-rotate-right text-warmGray/60 group-hover:text-roseGold transition-colors"></i>
+                            </div>
+                        </div>
+                        <!-- Back -->
+                        <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden rotate-y-180 bg-champagne/80 rounded-2xl border border-roseGold/30">
+                            <p class="font-serif italic text-charcoal text-lg leading-relaxed text-center my-auto">
+                                "Gündelik hayatın karmaşasında kendi içindeki zarafeti korumak en büyük sanattır."
+                            </p>
+                            <span class="text-xs text-roseGold font-semibold text-center">— Beyza'dan Bir Not</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Note Card 2 -->
+                <div class="perspective-1000 h-64 cursor-pointer group" onclick="flipCard(this)">
+                    <div class="transform-style-3d relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+                        <!-- Front -->
+                        <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden">
+                            <div class="flex justify-between items-center text-roseGold">
+                                <i class="fa-solid fa-mug-hot text-xl"></i>
+                                <span class="text-xs font-mono uppercase tracking-wider">02 / Huzur</span>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="font-serif text-2xl text-charcoal">Küçük Anlar</h3>
+                                <p class="text-xs text-warmGray mt-2">Kartı çevirmek için tıklayın</p>
+                            </div>
+                            <div class="text-right">
+                                <i class="fa-solid fa-arrow-rotate-right text-warmGray/60 group-hover:text-roseGold transition-colors"></i>
+                            </div>
+                        </div>
+                        <!-- Back -->
+                        <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden rotate-y-180 bg-rose-100/80 rounded-2xl border border-rose-200">
+                            <p class="font-serif italic text-charcoal text-lg leading-relaxed text-center my-auto">
+                                "Taze çekilmiş bir kahve kokusu ve sevdiğin bir melodi... Bazen tüm dünya bundan ibarettir."
+                            </p>
+                            <span class="text-xs text-roseGold font-semibold text-center">— Favori Anlar</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Note Card 3 -->
+                <div class="perspective-1000 h-64 cursor-pointer group" onclick="flipCard(this)">
+                    <div class="transform-style-3d relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+                        <!-- Front -->
+                        <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden">
+                            <div class="flex justify-between items-center text-roseGold">
+                                <i class="fa-solid fa-heart text-xl"></i>
+                                <span class="text-xs font-mono uppercase tracking-wider">03 / Samimiyet</span>
+                            </div>
+                            <div class="text-center">
+                                <h3 class="font-serif text-2xl text-charcoal">Gülümseme</h3>
+                                <p class="text-xs text-warmGray mt-2">Kartı çevirmek için tıklayın</p>
+                            </div>
+                            <div class="text-right">
+                                <i class="fa-solid fa-arrow-rotate-right text-warmGray/60 group-hover:text-roseGold transition-colors"></i>
+                            </div>
+                        </div>
+                        <!-- Back -->
+                        <div class="absolute inset-0 p-6 flex flex-col justify-between backface-hidden rotate-y-180 bg-champagne/80 rounded-2xl border border-roseGold/30">
+                            <p class="font-serif italic text-charcoal text-lg leading-relaxed text-center my-auto">
+                                "Etrafına yaydığın samimi enerji, çevrendekilerin gününü aydınlatmaya yeter."
+                            </p>
+                            <span class="text-xs text-roseGold font-semibold text-center">— Tebessüm</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add New Note Form -->
+            <div class="glass-card p-6 md:p-8 rounded-2xl max-w-xl mx-auto border border-roseGold/20 shadow-sm">
+                <h3 class="font-serif text-xl text-charcoal mb-4 text-center">Beyza'ya Bir Not veya Mesaj Bırak</h3>
+                <form id="addNoteForm" class="space-y-4" onsubmit="addNewNote(event)">
+                    <div>
+                        <input type="text" id="noteAuthor" placeholder="İsminiz" maxlength="80" required class="w-full px-4 py-2.5 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm transition-colors">
+                    </div>
+                    <div>
+                        <textarea id="noteContent" rows="3" maxlength="1000" placeholder="Güzel bir söz veya mesaj yazın..." required class="w-full px-4 py-2.5 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm transition-colors resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-roseGold text-white py-3 rounded-xl font-medium text-sm hover:bg-roseGold/90 transition-all shadow-md shadow-roseGold/20">
+                        Notu Ekle ✨
+                    </button>
+                    <p id="noteFormStatus" class="min-h-5 text-sm text-center text-warmGray" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+
+        <!-- COMMUNITY STORIES -->
+        <section id="stories" class="space-y-8">
+            <div class="text-center space-y-3">
+                <span class="text-xs font-semibold tracking-widest text-roseGold uppercase">TOPLULUKTAN HİKÂYELER</span>
+                <h2 class="font-serif text-3xl md:text-4xl text-charcoal">Hikâyeni Paylaş</h2>
+                <p class="text-sm text-warmGray max-w-lg mx-auto">Anılarını, ilham veren düşüncelerini ve küçük mutluluklarını bizimle paylaş. Hikâyeler herkes tarafından görülebilir; yazmak için hesabına giriş yapmalısın.</p>
+            </div>
+
+            <div class="glass-card rounded-3xl p-6 md:p-8 max-w-2xl mx-auto">
+                <form id="storyForm" class="space-y-4">
+                    <div>
+                        <label for="storyTitle" class="block text-sm text-warmGray mb-1">Hikâyenin başlığı</label>
+                        <input id="storyTitle" type="text" maxlength="100" required class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm disabled:opacity-60" disabled>
+                    </div>
+                    <div>
+                        <label for="storyContent" class="block text-sm text-warmGray mb-1">Hikâyen</label>
+                        <textarea id="storyContent" rows="5" maxlength="5000" required placeholder="Hikâyeni buraya yaz..." class="w-full px-4 py-3 rounded-xl border border-roseGold/20 bg-white/70 focus:outline-none focus:border-roseGold text-sm resize-y disabled:opacity-60" disabled></textarea>
+                    </div>
+                    <button id="storySubmitButton" type="submit" class="w-full bg-roseGold text-white py-3 rounded-xl font-medium text-sm hover:bg-roseGold/90 transition-colors disabled:opacity-60" disabled>Hikâyeni Paylaş</button>
+                    <p id="storyFormStatus" class="min-h-5 text-sm text-center text-warmGray" role="status" aria-live="polite">Hikâye yazmak için önce giriş yap.</p>
+                </form>
+            </div>
+
+            <div id="storiesList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            <p id="storiesStatus" class="text-sm text-center text-warmGray" role="status" aria-live="polite">Hikâyeler yükleniyor...</p>
+        </section>
+
+        <!-- PHOTO / GALLERY HIGHLIGHTS -->
+        <section id="gallery" class="space-y-8">
+            <div class="text-center space-y-3">
+                <span class="text-xs font-semibold tracking-widest text-roseGold uppercase">GALERİ &amp; ANILAR</span>
+                <h2 class="font-serif text-3xl md:text-4xl text-charcoal">Anların Estetiği</h2>
+                <p class="text-sm text-warmGray max-w-md mx-auto">Hayatın içinden ilham veren kareler ve favori köşeler.</p>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-3" role="group" aria-label="Galeri kategorileri">
+                <button type="button" class="gallery-filter px-5 py-2 rounded-full border border-roseGold/30 bg-white/70 text-sm text-charcoal transition-colors" data-gallery-filter="kahve" aria-pressed="false">Kahve Molası</button>
+                <button type="button" class="gallery-filter px-5 py-2 rounded-full border border-roseGold/30 bg-white/70 text-sm text-charcoal transition-colors" data-gallery-filter="yol" aria-pressed="false">Yolun Ritmi</button>
+                <button type="button" class="gallery-filter px-5 py-2 rounded-full border border-roseGold/30 bg-white/70 text-sm text-charcoal transition-colors" data-gallery-filter="ilham" aria-pressed="true">İlham Köşesi</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <article data-gallery-category="kahve" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Kahve molası kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Kahve%20Molası/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(10).jpeg" alt="Türk kahvesi ve lokum sunumu" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Türk kahvesiyle tatlı bir mola</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-mug-hot text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Bir fincan kahve, günün telaşında kendine ayırdığın zarif bir mola."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="kahve" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Sade kahve kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Kahve%20Molası/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(9).jpeg" alt="Kahve molasında sıcak bir fincan" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Sade bir fincan, sakin bir an</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-mug-hot text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Sadelik, bazen en derin huzurun ve en ince zevkin kendisidir."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="kahve" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Kafe köşesi kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Kahve%20Molası/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(5).jpeg" alt="Kahve ve kafe köşesi" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Huzurlu bir köşede keyifli vakit</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-mug-hot text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Güzel sohbetler ve sıcacık bir kahve, huzura açılan en zarif köşedir."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="kahve" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Latte kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Kahve%20Molası/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(3).jpeg" alt="Latte ve kahve sunumu" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Köpüklü kahve, yumuşak bir mola</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-mug-hot text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Kendine sunduğun küçük mutluluklar, gününe yumuşak bir güzellik katar."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="kahve" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Türk kahvesi kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Kahve%20Molası/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(2).jpeg" alt="Türk kahvesi sunumu" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Geleneksel kahvenin zarif hâli</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-mug-hot text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Kahvenin hatırı, paylaşılan anların zarafetinde saklıdır."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="yol" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Yolculuk kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Yolun%20Ritmi/WhatsApp%20Image%202026-10-20%20at%2000.55.20.jpeg" alt="Yolculuk sırasında çekilmiş manzara" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Yol boyunca güzel manzaralar</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-route text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Yolun güzelliği, vardığın yerde değil; incelikle biriktirdiğin anlarda saklıdır."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="yol" hidden class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Yol molası kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/Yolun%20Ritmi/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(1).jpeg" alt="Yolculukta verilen kahve molası" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Yolculuğa eşlik eden küçük bir keyif</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-route text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Bazen en güzel keşif, yolun ortasında kendine verdiğin küçük bir moladır."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="ilham" class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Stil kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/%C4%B0lham%20K%C3%B6%C5%9Fesi/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(4).jpeg" alt="Şık bir kişisel stil anı" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Stile incelik katan sade dokunuşlar</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-sparkles text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Zarafet, kendini gösterişte değil; her ayrıntıya kattığın incelikte bulur."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="ilham" class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Aksesuar kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/%C4%B0lham%20K%C3%B6%C5%9Fesi/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(6).jpeg" alt="Takı ve zarif aksesuar detayları" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Işıltıyı tamamlayan zarif detaylar</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-sparkles text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"İncelikle seçilmiş küçük bir detay, bütün güzelliğe kendi ışıltısını katar."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="ilham" class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="Sakin an kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/%C4%B0lham%20K%C3%B6%C5%9Fesi/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(7).jpeg" alt="Sakin ve rahat bir an" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Kendine ayrılmış sakin bir an</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-sparkles text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Kendine ayırdığın dingin bir an, ruhunun zarafetle yeniden çiçek açmasına izin verir."</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article data-gallery-category="ilham" class="perspective-1000 group cursor-pointer" onclick="flipCard(this)" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); flipCard(this); }" role="button" tabindex="0" aria-label="İlham kartını çevir">
+                    <div class="transform-style-3d relative h-[23rem] w-full rounded-2xl">
+                        <div class="absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden">
+                            <div class="relative h-80 overflow-hidden bg-champagne">
+                                <img src="images/%C4%B0lham%20K%C3%B6%C5%9Fesi/WhatsApp%20Image%202026-10-20%20at%2000.55.20%20(8).jpeg" alt="İlham panosu ve estetik detaylar" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                            </div>
+                            <div class="p-5"><p class="text-xs tracking-wide text-warmGray">Renklerden ve dokulardan ilham</p></div>
+                        </div>
+                        <div class="absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-sparkles text-roseGold text-2xl mb-5"></i>
+                            <p class="font-serif italic text-xl text-charcoal leading-relaxed">"Zarif bir bakış, en sade renklerde ve dokularda bile saklı güzelliği görür."</p>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- FAVORITE THINGS & PLAYLIST WIDGET -->
+        <section id="favorites" class="space-y-8">
+            <div class="text-center space-y-3">
+                <span class="text-xs font-semibold tracking-widest text-roseGold uppercase">KİŞİSEL TERCİHLER</span>
+                <h2 class="font-serif text-3xl md:text-4xl text-charcoal">Favoriler &amp; Müzik</h2>
+                <p class="text-sm text-warmGray max-w-md mx-auto">Sevdiğim lezzetler, mekanlar ve kulağıma çalınan ezgiler.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Favorites Cards -->
+                <div class="space-y-4">
+                    <div class="glass-card p-6 rounded-2xl border border-roseGold/20 flex items-center gap-5 hover:border-roseGold/40 transition-colors">
+                        <div class="w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center text-roseGold text-2xl shrink-0">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-roseGold font-medium uppercase tracking-wider">Favori Meyve</span>
+                            <h4 class="font-serif text-xl text-charcoal font-semibold">Taze İncir &amp; Meyve Sunumları</h4>
+                            <p class="text-xs text-warmGray mt-1">Ege esintili, taze ve doğal lezzetlerin yeri her zaman ayrı.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl border border-roseGold/20 flex items-center gap-5 hover:border-roseGold/40 transition-colors">
+                        <div class="w-14 h-14 rounded-2xl bg-champagne flex items-center justify-center text-roseGold text-2xl shrink-0">
+                            <i class="fa-solid fa-mug-hot"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-roseGold font-medium uppercase tracking-wider">Favori İçecek</span>
+                            <h4 class="font-serif text-xl text-charcoal font-semibold">Türk Kahvesi &amp; Latte</h4>
+                            <p class="text-xs text-warmGray mt-1">Sakin anlara eşlik eden sıcak ve keyifli kahve ritüelleri.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl border border-roseGold/20 flex items-center gap-5 hover:border-roseGold/40 transition-colors">
+                        <div class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-roseGold text-2xl shrink-0">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-roseGold font-medium uppercase tracking-wider">Favori Mekanlar</span>
+                            <h4 class="font-serif text-xl text-charcoal font-semibold">Dostlarla sakin bir köşe</h4>
+                            <p class="text-xs text-warmGray mt-1">Güzel sohbetlerin, kahvenin ve birlikte biriken küçük anların huzuru olan her yer</p>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Recently played song -->
+                    <div class="glass-card p-6 md:p-8 rounded-2xl border border-roseGold/20 flex flex-col justify-between relative overflow-hidden">
+                        <div class="space-y-6">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-semibold tracking-wider text-roseGold uppercase">Müzik Çalarlar</span>
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-roseGold text-xs font-medium">
+                                    <i class="fa-brands fa-youtube"></i> YouTube Music
+                                </span>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="font-serif text-2xl text-charcoal">Son Zamanlarda Dinlediği Şarkılar</h3>
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-roseGold/15 bg-white/40 p-4">
+                                    <p class="text-sm font-medium text-charcoal">Derya Bedavacı - Atlatırım</p>
+                                    <div class="flex shrink-0 items-center gap-2">
+                                        <a href="https://music.youtube.com/watch?v=CKberQBAnZ0&amp;list=RDCKberQBAnZ0&amp;start_radio=1" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-full bg-roseGold px-4 py-2 text-xs font-medium text-white hover:bg-roseGold/90 transition-colors" aria-label="Derya Bedavacı - Atlatırım şarkısını YouTube Music'te aç">
+                                            <i class="fa-brands fa-youtube text-roseGold"></i>YouTube Music
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-roseGold/15 bg-white/40 p-4">
+                                    <p class="text-sm font-medium text-charcoal">Rober Hatemo - Beyaz ve Sen</p>
+                                    <div class="flex shrink-0 items-center gap-2">
+                                        <a href="https://music.youtube.com/watch?v=bicSNVB9oWU&amp;list=RDbicSNVB9oWU&amp;start_radio=1" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-full bg-roseGold px-4 py-2 text-xs font-medium text-white hover:bg-roseGold/90 transition-colors" aria-label="Rober Hatemo - Beyaz ve Sen şarkısını YouTube Music'te aç">
+                                            <i class="fa-brands fa-youtube text-roseGold"></i>YouTube Music
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- "GÜNÜN TEBESSÜMÜ" INTERACTIVE SECTION -->
+        <section class="glass-card p-8 md:p-12 rounded-3xl border border-roseGold/30 text-center space-y-6 relative overflow-hidden shadow-sm">
+            <div class="max-w-2xl mx-auto space-y-4">
+                <div class="w-16 h-16 rounded-full bg-rose-100 text-roseGold flex items-center justify-center text-2xl mx-auto mb-2">
+                    <i class="fa-solid fa-sun"></i>
+                </div>
+                
+                <h2 class="font-serif text-3xl md:text-4xl text-charcoal">Günün Tebessümü</h2>
+                <p class="text-sm text-warmGray">Kendine veya sevdiklerine tatlı bir motivasyon mesajı almak için aşağıdaki butona tıkla.</p>
+
+                <div class="min-h-[90px] flex items-center justify-center p-6 bg-white/60 rounded-2xl border border-roseGold/15 my-6">
+                    <p id="complimentText" class="font-serif italic text-xl text-charcoal leading-relaxed">
+                        "Bugün harika şeylerin başlangıcı olabilir. Tıpkı senin etrafa yaydığın pozitif enerji gibi!"
+                    </p>
+                </div>
+
+                <button onclick="triggerSmile()" class="bg-roseGold hover:bg-roseGold/90 text-white font-medium px-8 py-3.5 rounded-full text-sm transition-all shadow-md shadow-roseGold/25 hover:shadow-lg hover:shadow-roseGold/30 hover:-translate-y-0.5 flex items-center gap-2 mx-auto">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Yeni Bir Tebessüm Yakala
+                </button>
+            </div>
+        </section>
+
+        <!-- CONTACT CARD -->
+        <section class="space-y-8 pb-6">
+            <div class="text-center space-y-3">
+                <span class="text-xs font-semibold tracking-widest text-roseGold uppercase">İLETİŞİM</span>
+                <h2 class="font-serif text-3xl md:text-4xl text-charcoal">Beni Buradan Takip Edin</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                <a href="mailto:beyzzcnn@gmail.com" class="glass-card glass-card-hover rounded-3xl p-6 border border-roseGold/20 block flex flex-col h-full justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-rose-100 text-roseGold flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-envelope"></i>
+                        </div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-roseGold">E-posta</p>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="font-serif text-2xl text-charcoal">Beyza Özcan</h3>
+                        <p class="mt-3 text-sm text-warmGray break-all">beyzzcnn@gmail.com</p>
+                    </div>
+                </a>
+
+                <a href="https://instagram.com/beyzzaozcann" target="_blank" rel="noreferrer" class="glass-card glass-card-hover rounded-3xl p-6 border border-roseGold/20 block flex flex-col h-full justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-champagne text-roseGold flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-brands fa-instagram"></i>
+                        </div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-roseGold">Instagram</p>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="font-serif text-2xl text-charcoal">Beyza Özcan</h3>
+                        <p class="mt-3 text-sm text-warmGray">Günlük anlar ve ilham paylaşımları.</p>
+                    </div>
+                </a>
+
+                <a href="https://tiktok.com/@beyzziizcnn" target="_blank" rel="noreferrer" class="glass-card glass-card-hover rounded-3xl p-6 border border-roseGold/20 block flex flex-col h-full justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-rose-50 text-roseGold flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-brands fa-tiktok"></i>
+                        </div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-roseGold">TikTok</p>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="font-serif text-2xl text-charcoal">Beyza Özcan</h3>
+                        <p class="mt-3 text-sm text-warmGray">Kısa ve samimi anlar, içerikler.</p>
+                    </div>
+                </a>
+
+                <a href="https://www.youtube.com/@beyzzaozcann" target="_blank" rel="noreferrer" class="glass-card glass-card-hover rounded-3xl p-6 border border-roseGold/20 block flex flex-col h-full justify-between">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-rose-100 text-roseGold flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <p class="text-xs font-medium uppercase tracking-wider text-roseGold">YouTube</p>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="font-serif text-2xl text-charcoal">Beyza Özcan</h3>
+                        <p class="mt-3 text-sm text-warmGray">İzlenmeye değer içerikler ve paylaşımlar.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-roseGold/15 py-10 bg-white/40 relative z-10">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+            <div>
+                <p class="font-serif text-lg font-semibold text-charcoal">Beyza Özcan</p>
+                <p class="text-xs text-warmGray mt-1">Zarafet, Estetik &amp; Anlamlı Anlar</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-3 text-sm text-warmGray">
+                <a href="mailto:beyzzcnn@gmail.com" class="hover:text-roseGold transition-colors">beyzzcnn@gmail.com</a>
+                <span class="hidden md:inline text-roseGold/50">•</span>
+                <a href="https://instagram.com/beyzzaozcann" target="_blank" rel="noreferrer" class="hover:text-roseGold transition-colors">Instagram: beyzzaozcann</a>
+                <span class="hidden md:inline text-roseGold/50">•</span>
+                <a href="https://tiktok.com/@beyzziizcnn" target="_blank" rel="noreferrer" class="hover:text-roseGold transition-colors">Tiktok: beyzziizcnn</a>
+                <span class="hidden md:inline text-roseGold/50">•</span>
+                <a href="https://youtube.com/@beyzzaozcann" target="_blank" rel="noreferrer" class="hover:text-roseGold transition-colors">Youtube: beyzzaozcann</a>
+            </div>
+
+            <p class="text-xs text-warmGray">
+                &copy; 2026 Tüm Hakları Saklıdır. Sevgiyle Tasarlandı.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Supabase client and public configuration (never place a service-role key here) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const noteDatabase = window.supabase && window.SUPABASE_CONFIG?.url && window.SUPABASE_CONFIG?.anonKey
+            ? window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey)
+            : null;
+        let currentUser = null;
+        let accountMode = 'signin';
+        let passwordRecoveryMode = false;
+        let friendRequests = [];
+        let friendProfiles = new Map();
+        let friendsLoading = false;
+        let friendsReloadRequested = false;
+        let friendRefreshTimer = null;
+        let friendRequestBadgeTimer = null;
+        let activeChatFriend = null;
+        let chatRefreshTimer = null;
+        let chatUnreadTimer = null;
+        let unreadMessageCount = 0;
+        let managedSiteContent = {};
+
+        const accountModal = document.getElementById('accountModal');
+        const accountForm = document.getElementById('accountForm');
+        const accountStatus = document.getElementById('accountStatus');
+        const storyForm = document.getElementById('storyForm');
+
+        function isAdminUser(user) {
+            const adminEmail = window.SUPABASE_CONFIG?.adminEmail;
+            return Boolean(
+                adminEmail &&
+                user?.email &&
+                user.email.toLowerCase() === adminEmail.toLowerCase()
+            );
+        }
+
+        function openAccountModal() {
+            if (!currentUser) {
+                setAccountMode('signin');
+            } else {
+                setAccountTab('profile');
+            }
+            accountStatus.textContent = noteDatabase
+                ? ''
+                : 'Hesaplar için site yöneticisinin Supabase bağlantısını yapılandırması gerekiyor.';
+            accountModal.classList.remove('hidden');
+            accountModal.classList.add('flex');
+            if (!currentUser) document.getElementById('accountEmail').focus();
+        }
+
+        function closeAccountModal() {
+            accountModal.classList.add('hidden');
+            accountModal.classList.remove('flex');
+            stopFriendRefresh();
+        }
+
+        function setAccountMode(mode) {
+            accountMode = mode;
+            const isSignUp = mode === 'signup';
+            document.getElementById('accountEyebrow').textContent = 'Hikâye Paylaşımı';
+            document.getElementById('accountModalTitle').textContent = isSignUp ? 'Hesabını Oluştur' : 'Hesabına Giriş Yap';
+            document.getElementById('accountSubmitButton').textContent = isSignUp ? 'Kayıt Ol' : 'Giriş Yap';
+            document.getElementById('displayNameField').classList.toggle('hidden', !isSignUp);
+            document.getElementById('accountDisplayName').required = isSignUp;
+            const passwordConfirmation = document.getElementById('accountPasswordConfirmation');
+            document.getElementById('confirmPasswordField').classList.toggle('hidden', !isSignUp);
+            passwordConfirmation.required = isSignUp;
+            passwordConfirmation.value = '';
+            document.getElementById('accountPassword').autocomplete = isSignUp ? 'new-password' : 'current-password';
+            document.getElementById('accountModePrompt').firstChild.textContent = isSignUp ? 'Zaten hesabın var mı? ' : 'Hesabın yok mu? ';
+            document.getElementById('toggleAccountMode').textContent = isSignUp ? 'Giriş yap' : 'Kayıt ol';
+            accountStatus.textContent = '';
+            accountStatus.classList.remove('text-roseGold');
+        }
+
+        function setAccountTab(tab) {
+            document.querySelectorAll('[data-account-tab]').forEach(button => {
+                const isActive = button.dataset.accountTab === tab;
+                button.setAttribute('aria-selected', String(isActive));
+                button.classList.toggle('bg-rose-100', isActive);
+                button.classList.toggle('text-charcoal', isActive);
+                button.classList.toggle('text-warmGray', !isActive);
+            });
+            document.querySelectorAll('[data-account-panel]').forEach(panel => {
+                panel.classList.toggle('hidden', panel.dataset.accountPanel !== tab);
+            });
+        }
+
+        async function savePublicProfile(user) {
+            const { error } = await noteDatabase
+                .from('member_profiles')
+                .upsert({
+                    user_id: user.id,
+                    display_name: user.user_metadata?.display_name || user.email.split('@')[0],
+                    bio: user.user_metadata?.bio || '',
+                    avatar_url: user.user_metadata?.avatar_url || ''
+                }, { onConflict: 'user_id' });
+
+            if (error) throw error;
+        }
+
+        async function refreshFriendRequestBadge() {
+            if (!noteDatabase || !currentUser) return;
+
+            const badge = document.getElementById('friendRequestBadge');
+            const { count, error } = await noteDatabase
+                .from('friend_requests')
+                .select('id', { count: 'exact', head: true })
+                .eq('recipient_id', currentUser.id)
+                .eq('status', 'pending');
+
+            if (error) {
+                console.error('Bekleyen arkadaşlık isteği sayısı alınamadı:', error);
+                return;
+            }
+
+            badge.textContent = String(count || 0);
+            badge.classList.toggle('hidden', !count);
+        }
+
+        function stopFriendRefresh() {
+            if (friendRefreshTimer) {
+                window.clearInterval(friendRefreshTimer);
+                friendRefreshTimer = null;
+            }
+        }
+
+        function startFriendRefresh() {
+            stopFriendRefresh();
+            friendRefreshTimer = window.setInterval(() => {
+                if (
+                    currentUser &&
+                    !accountModal.classList.contains('hidden') &&
+                    document.querySelector('[data-account-tab="friends"]').getAttribute('aria-selected') === 'true'
+                ) {
+                    loadFriends();
+                }
+            }, 15000);
+        }
+
+        function appendMemberRow(container, profile, actionLabel, onAction, actionStyle = 'border-roseGold/30 text-charcoal hover:bg-white') {
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between gap-3 rounded-xl border border-roseGold/15 bg-white/50 p-3';
+
+            const identity = document.createElement('div');
+            identity.className = 'flex min-w-0 items-center gap-3';
+            if (profile.avatar_url) {
+                const avatar = document.createElement('img');
+                avatar.src = profile.avatar_url;
+                avatar.alt = '';
+                avatar.className = 'w-10 h-10 rounded-full object-cover border border-roseGold/30 shrink-0';
+                avatar.onerror = () => avatar.remove();
+                identity.appendChild(avatar);
+            } else {
+                const avatar = document.createElement('span');
+                avatar.className = 'w-10 h-10 rounded-full bg-rose-100 text-roseGold flex items-center justify-center shrink-0';
+                avatar.textContent = profile.display_name.trim().charAt(0).toLocaleUpperCase('tr-TR') || '?';
+                identity.appendChild(avatar);
+            }
+
+            const name = document.createElement('span');
+            name.className = 'truncate text-sm font-medium text-charcoal';
+            name.textContent = profile.display_name;
+            identity.appendChild(name);
+            row.appendChild(identity);
+
+            if (actionLabel && onAction) {
+                const actionButton = document.createElement('button');
+                actionButton.type = 'button';
+                actionButton.className = `shrink-0 rounded-full border px-3 py-2 text-xs transition-colors ${actionStyle}`;
+                actionButton.textContent = actionLabel;
+                actionButton.addEventListener('click', onAction);
+                row.appendChild(actionButton);
+            } else if (actionLabel) {
+                const actionText = document.createElement('span');
+                actionText.className = `shrink-0 text-xs ${actionStyle}`;
+                actionText.textContent = actionLabel;
+                row.appendChild(actionText);
+            }
+            container.appendChild(row);
+        }
+
+        function renderFriendLists() {
+            const incomingContainer = document.getElementById('incomingFriendRequests');
+            const outgoingContainer = document.getElementById('outgoingFriendRequests');
+            const friendsContainer = document.getElementById('friendsList');
+            const status = document.getElementById('friendsStatus');
+            incomingContainer.replaceChildren();
+            outgoingContainer.replaceChildren();
+            friendsContainer.replaceChildren();
+
+            const incoming = friendRequests.filter(request => request.status === 'pending' && request.recipient_id === currentUser.id);
+            const outgoing = friendRequests.filter(request => request.status === 'pending' && request.sender_id === currentUser.id);
+            const friends = friendRequests.filter(request => request.status === 'accepted');
+
+            incoming.forEach(request => {
+                const profile = friendProfiles.get(request.sender_id) || {
+                    user_id: request.sender_id,
+                    display_name: 'Bir üye',
+                    avatar_url: ''
+                };
+                appendMemberRow(incomingContainer, profile, 'Kabul et', async () => {
+                    await updateFriendRequest(request.id, 'accepted');
+                });
+                const row = incomingContainer.lastElementChild;
+                const rejectButton = document.createElement('button');
+                rejectButton.type = 'button';
+                rejectButton.className = 'shrink-0 rounded-full border border-roseGold/20 px-3 py-2 text-xs text-warmGray hover:bg-rose-50 transition-colors';
+                rejectButton.textContent = 'Reddet';
+                rejectButton.addEventListener('click', async () => updateFriendRequest(request.id, 'rejected'));
+                row.appendChild(rejectButton);
+            });
+
+            outgoing.forEach(request => {
+                const profile = friendProfiles.get(request.recipient_id) || {
+                    user_id: request.recipient_id,
+                    display_name: 'Bir üye',
+                    avatar_url: ''
+                };
+                appendMemberRow(outgoingContainer, profile, 'İstek gönderildi', null, 'border-roseGold/20 text-warmGray');
+            });
+
+            friends.forEach(request => {
+                const friendId = request.sender_id === currentUser.id ? request.recipient_id : request.sender_id;
+                const profile = friendProfiles.get(friendId) || {
+                    user_id: friendId,
+                    display_name: 'Bir üye',
+                    avatar_url: ''
+                };
+                appendMemberRow(friendsContainer, profile, 'Arkadaşlıktan çıkar', async () => {
+                    await removeFriend(request.id);
+                }, 'border-roseGold/30 text-roseGold hover:bg-rose-50');
+            });
+
+            if (!incoming.length) {
+                const accountLabel = currentUser.email ? ` (${currentUser.email})` : '';
+                incomingContainer.textContent = `Bu hesap${accountLabel} için bekleyen arkadaşlık isteği bulunamadı.`;
+            }
+            if (!outgoing.length) outgoingContainer.textContent = 'Gönderilmiş bekleyen isteğin yok.';
+            if (!friends.length) friendsContainer.textContent = 'Henüz arkadaş eklemedin.';
+            status.textContent = '';
+        }
+
+        async function loadFriends() {
+            if (!noteDatabase || !currentUser) return;
+            if (friendsLoading) {
+                friendsReloadRequested = true;
+                return;
+            }
+            friendsLoading = true;
+            const status = document.getElementById('friendsStatus');
+            status.classList.remove('text-roseGold');
+            status.textContent = 'Arkadaşların yükleniyor...';
+
+            try {
+                await savePublicProfile(currentUser);
+                const requestFields = 'id, sender_id, recipient_id, status, created_at';
+                const [incomingResult, outgoingResult] = await Promise.all([
+                    noteDatabase
+                        .from('friend_requests')
+                        .select(requestFields)
+                        .eq('recipient_id', currentUser.id),
+                    noteDatabase
+                        .from('friend_requests')
+                        .select(requestFields)
+                        .eq('sender_id', currentUser.id)
+                ]);
+                if (incomingResult.error) throw incomingResult.error;
+                if (outgoingResult.error) throw outgoingResult.error;
+
+                const requests = [...new Map(
+                    [...(incomingResult.data || []), ...(outgoingResult.data || [])]
+                        .map(request => [request.id, request])
+                ).values()].sort((first, second) =>
+                    new Date(second.created_at).getTime() - new Date(first.created_at).getTime()
+                );
+                friendRequests = requests;
+                const memberIds = [...new Set(requests.flatMap(request => [request.sender_id, request.recipient_id]))]
+                    .filter(userId => userId !== currentUser.id);
+                friendProfiles = new Map();
+
+                if (memberIds.length) {
+                    const { data: profiles, error: profilesError } = await noteDatabase
+                        .from('member_profiles')
+                        .select('user_id, display_name, avatar_url')
+                        .in('user_id', memberIds);
+                    if (profilesError) throw profilesError;
+                    profiles.forEach(profile => friendProfiles.set(profile.user_id, profile));
+                }
+
+                renderFriendLists();
+                await refreshFriendRequestBadge();
+            } catch (error) {
+                console.error('Arkadaşlar yüklenemedi:', error);
+                status.classList.add('text-roseGold');
+                const errorCode = error?.code ? ` (${error.code})` : '';
+                const errorMessage = error?.message || 'Bilinmeyen bir veritabanı hatası.';
+                status.textContent = `Arkadaş istekleri yüklenemedi${errorCode}: ${errorMessage} Supabase SQL kurulumunun güncel olduğundan ve friend_requests erişiminin açık olduğundan emin ol.`;
+            } finally {
+                friendsLoading = false;
+                if (friendsReloadRequested) {
+                    friendsReloadRequested = false;
+                    window.setTimeout(loadFriends, 0);
+                }
+            }
+        }
+
+        async function updateFriendRequest(requestId, nextStatus) {
+            const status = document.getElementById('friendsStatus');
+            status.textContent = 'İstek güncelleniyor...';
+            const { error } = await noteDatabase
+                .from('friend_requests')
+                .update({ status: nextStatus })
+                .eq('id', requestId)
+                .eq('status', 'pending');
+            if (error) {
+                console.error('Arkadaşlık isteği güncellenemedi:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'İstek güncellenemedi. Lütfen tekrar dene.';
+                return;
+            }
+            await loadFriends();
+        }
+
+        async function removeFriend(requestId) {
+            const status = document.getElementById('friendsStatus');
+            status.textContent = 'Arkadaş kaldırılıyor...';
+            const { error } = await noteDatabase
+                .from('friend_requests')
+                .delete()
+                .eq('id', requestId)
+                .eq('status', 'accepted');
+            if (error) {
+                console.error('Arkadaş kaldırılamadı:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'Arkadaş kaldırılamadı. Lütfen tekrar dene.';
+                return;
+            }
+            await loadFriends();
+        }
+
+        function setChatStatus(message, isError = false) {
+            const status = document.getElementById('chatStatus');
+            status.textContent = message;
+            status.classList.toggle('text-roseGold', isError);
+            status.classList.toggle('hidden', !message);
+        }
+
+        function showChatFriendList() {
+            activeChatFriend = null;
+            if (chatRefreshTimer) {
+                window.clearInterval(chatRefreshTimer);
+                chatRefreshTimer = null;
+            }
+            document.getElementById('chatWindowTitle').textContent = 'Mesajlar';
+            document.getElementById('chatSubtitle').textContent = 'Arkadaşlarınla özel sohbet et';
+            document.getElementById('chatBackButton').classList.add('hidden');
+            document.getElementById('chatFriendList').classList.remove('hidden');
+            document.getElementById('chatConversation').classList.add('hidden');
+            document.getElementById('chatConversation').classList.remove('flex');
+            setChatStatus('');
+        }
+
+        async function loadChatFriends() {
+            const container = document.getElementById('chatFriendList');
+            container.replaceChildren();
+            setChatStatus('Arkadaşların yükleniyor...');
+
+            const { data: acceptedRequests, error: requestsError } = await noteDatabase
+                .from('friend_requests')
+                .select('sender_id, recipient_id')
+                .eq('status', 'accepted')
+                .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`);
+
+            if (requestsError) {
+                console.error('Sohbet arkadaşları yüklenemedi:', requestsError);
+                setChatStatus('Arkadaş listesi yüklenemedi. Supabase kurulumunu kontrol et.', true);
+                return;
+            }
+
+            const friendIds = [...new Set(acceptedRequests.map(request =>
+                request.sender_id === currentUser.id ? request.recipient_id : request.sender_id
+            ))];
+            if (!friendIds.length) {
+                container.textContent = 'Sohbet etmek için önce arkadaş ekleyip isteğinin kabul edilmesini bekle.';
+                setChatStatus('');
+                return;
+            }
+
+            const { data: profiles, error: profilesError } = await noteDatabase
+                .from('member_profiles')
+                .select('user_id, display_name, avatar_url')
+                .in('user_id', friendIds);
+
+            if (profilesError) {
+                console.error('Sohbet profilleri yüklenemedi:', profilesError);
+                setChatStatus('Arkadaş profilleri yüklenemedi. Lütfen tekrar dene.', true);
+                return;
+            }
+
+            const { data: recentMessages, error: messagesError } = await noteDatabase
+                .from('private_messages')
+                .select('id, sender_id, recipient_id, content, created_at, read_at')
+                .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+                .order('created_at', { ascending: false })
+                .limit(500);
+
+            if (messagesError) {
+                console.error('Sohbet önizlemeleri yüklenemedi:', messagesError);
+                setChatStatus('Son mesajlar yüklenemedi. Lütfen sohbet penceresini yeniden aç.', true);
+                return;
+            }
+
+            const latestMessageByFriend = new Map();
+            const unreadCountByFriend = new Map();
+            recentMessages.forEach(message => {
+                const friendId = message.sender_id === currentUser.id ? message.recipient_id : message.sender_id;
+                if (!friendIds.includes(friendId)) return;
+
+                if (!latestMessageByFriend.has(friendId)) {
+                    latestMessageByFriend.set(friendId, message);
+                }
+                if (message.recipient_id === currentUser.id && !message.read_at) {
+                    unreadCountByFriend.set(friendId, (unreadCountByFriend.get(friendId) || 0) + 1);
+                }
+            });
+
+            profiles.forEach(profile => friendProfiles.set(profile.user_id, profile));
+            profiles.forEach(profile => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'mb-2 flex w-full items-center gap-3 rounded-2xl border border-roseGold/15 bg-white/60 p-3 text-left transition-colors hover:bg-rose-50';
+                if (profile.avatar_url) {
+                    const avatar = document.createElement('img');
+                    avatar.src = profile.avatar_url;
+                    avatar.alt = '';
+                    avatar.className = 'h-11 w-11 shrink-0 rounded-full border border-roseGold/30 object-cover';
+                    avatar.onerror = () => {
+                        avatar.replaceWith(createChatAvatarFallback(profile.display_name));
+                    };
+                    button.appendChild(avatar);
+                } else {
+                    button.appendChild(createChatAvatarFallback(profile.display_name));
+                }
+
+                const details = document.createElement('span');
+                details.className = 'min-w-0 flex-1';
+                const name = document.createElement('span');
+                name.className = 'block truncate text-sm font-medium text-charcoal';
+                name.textContent = profile.display_name;
+                const preview = document.createElement('span');
+                preview.className = 'block truncate text-xs text-warmGray';
+                const latestMessage = latestMessageByFriend.get(profile.user_id);
+                preview.textContent = latestMessage
+                    ? `${latestMessage.sender_id === currentUser.id ? 'Sen: ' : ''}${latestMessage.content}`
+                    : 'Henüz mesaj yok';
+                details.append(name, preview);
+                button.appendChild(details);
+
+                const rightSide = document.createElement('span');
+                rightSide.className = 'flex shrink-0 flex-col items-end gap-1';
+                if (latestMessage) {
+                    const messageTime = document.createElement('time');
+                    messageTime.className = 'text-[10px] text-warmGray';
+                    messageTime.dateTime = latestMessage.created_at;
+                    messageTime.textContent = new Intl.DateTimeFormat('tr-TR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }).format(new Date(latestMessage.created_at));
+                    rightSide.appendChild(messageTime);
+                }
+                const unreadCount = unreadCountByFriend.get(profile.user_id) || 0;
+                if (unreadCount) {
+                    const unreadBadge = document.createElement('span');
+                    unreadBadge.className = 'flex min-w-5 h-5 items-center justify-center rounded-full bg-roseGold px-1 text-[10px] font-semibold text-white';
+                    unreadBadge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                    rightSide.appendChild(unreadBadge);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = 'fa-regular fa-message text-roseGold';
+                    rightSide.appendChild(icon);
+                }
+                button.appendChild(rightSide);
+                button.addEventListener('click', () => openChatConversation(profile));
+                container.appendChild(button);
+            });
+            setChatStatus(profiles.length ? '' : 'Arkadaş profili bulunamadı. Arkadaş listesini yenileyip tekrar dene.');
+        }
+
+        function createChatAvatarFallback(name) {
+            const avatar = document.createElement('span');
+            avatar.className = 'flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-roseGold/30 bg-rose-100 text-roseGold';
+            avatar.textContent = name.trim().charAt(0).toLocaleUpperCase('tr-TR') || '?';
+            return avatar;
+        }
+
+        async function openChatConversation(profile) {
+            activeChatFriend = profile;
+            document.getElementById('chatWindowTitle').textContent = profile.display_name;
+            document.getElementById('chatSubtitle').textContent = 'Özel sohbet';
+            document.getElementById('chatBackButton').classList.remove('hidden');
+            document.getElementById('chatFriendList').classList.add('hidden');
+            document.getElementById('chatConversation').classList.remove('hidden');
+            document.getElementById('chatConversation').classList.add('flex');
+            setChatStatus('');
+            await loadChatMessages();
+            if (chatRefreshTimer) window.clearInterval(chatRefreshTimer);
+            chatRefreshTimer = window.setInterval(loadChatMessages, 5000);
+            document.getElementById('chatMessageInput').focus();
+        }
+
+        async function loadChatMessages() {
+            if (!noteDatabase || !currentUser || !activeChatFriend) return;
+
+            const friendId = activeChatFriend.user_id;
+            const friendName = activeChatFriend.display_name;
+            const messagesContainer = document.getElementById('chatMessages');
+            const shouldScrollToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight < 80;
+            const { data: messages, error } = await noteDatabase
+                .from('private_messages')
+                .select('id, sender_id, recipient_id, content, created_at, read_at')
+                .or(
+                    `and(sender_id.eq.${currentUser.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${currentUser.id})`
+                )
+                .order('created_at', { ascending: false })
+                .limit(200);
+
+            if (error) {
+                console.error('Sohbet mesajları yüklenemedi:', error);
+                setChatStatus('Mesajlar yüklenemedi. Supabase SQL kurulumunun güncel olduğundan emin ol.', true);
+                return;
+            }
+            if (activeChatFriend?.user_id !== friendId) return;
+
+            messages.reverse();
+            const currentMessages = [...messagesContainer.querySelectorAll('[data-message-id]')];
+            const currentMessageState = currentMessages.map(element =>
+                `${element.dataset.messageId}:${element.dataset.readAt || ''}`
+            );
+            const nextMessageState = messages.map(message =>
+                `${message.id}:${message.read_at || ''}`
+            );
+            const messagesUnchanged = currentMessageState.length === nextMessageState.length &&
+                currentMessageState.every((state, index) => state === nextMessageState[index]);
+
+            if (!messagesUnchanged) {
+                messagesContainer.replaceChildren();
+                if (!messages.length) {
+                    const emptyState = document.createElement('p');
+                    emptyState.className = 'py-8 text-center text-sm text-warmGray';
+                    emptyState.textContent = `${friendName} ile sohbeti başlat.`;
+                    messagesContainer.appendChild(emptyState);
+                }
+
+                messages.forEach((message, index) => {
+                    const messageRow = document.createElement('div');
+                    messageRow.dataset.messageId = message.id;
+                    messageRow.dataset.readAt = message.read_at || '';
+                    messageRow.className = `flex ${message.sender_id === currentUser.id ? 'justify-end' : 'justify-start'}`;
+                    const messageGroup = document.createElement('div');
+                    messageGroup.className = 'flex max-w-[85%] flex-col';
+                    const bubble = document.createElement('div');
+                    bubble.className = `rounded-2xl px-3 py-2 ${message.sender_id === currentUser.id ? 'rounded-br-md bg-roseGold text-white' : 'rounded-bl-md border border-roseGold/15 bg-white/80 text-charcoal'}`;
+                    const content = document.createElement('p');
+                    content.className = 'whitespace-pre-wrap break-words text-sm';
+                    content.textContent = message.content;
+                    const date = document.createElement('time');
+                    date.className = `mt-1 block text-right text-[10px] ${message.sender_id === currentUser.id ? 'text-white/75' : 'text-warmGray'}`;
+                    date.dateTime = message.created_at;
+                    date.textContent = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' }).format(new Date(message.created_at));
+                    bubble.append(content, date);
+                    messageGroup.appendChild(bubble);
+                    const isLastInOutgoingGroup = message.sender_id === currentUser.id &&
+                        (index === messages.length - 1 || messages[index + 1].sender_id !== currentUser.id);
+                    if (isLastInOutgoingGroup && message.read_at) {
+                        const readReceipt = document.createElement('span');
+                        readReceipt.className = 'mt-1 self-end text-[10px] text-roseGold';
+                        readReceipt.textContent = '✓ Görüldü';
+                        messageGroup.appendChild(readReceipt);
+                    }
+                    messageRow.appendChild(messageGroup);
+                    messagesContainer.appendChild(messageRow);
+                });
+            }
+
+            setChatStatus('');
+            if (shouldScrollToBottom) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            const unreadConversationIds = messages
+                .filter(message => message.sender_id === friendId && !message.read_at)
+                .map(message => message.id);
+            if (unreadConversationIds.length) {
+                const { error: markReadError } = await noteDatabase
+                    .from('private_messages')
+                    .update({ read_at: new Date().toISOString() })
+                    .in('id', unreadConversationIds)
+                    .eq('recipient_id', currentUser.id)
+                    .is('read_at', null);
+                if (markReadError) {
+                    console.error('Mesajlar okundu olarak işaretlenemedi:', markReadError);
+                    setChatStatus('Mesajlar okundu olarak işaretlenemedi. Supabase SQL kurulumunun güncel olduğundan emin ol.', true);
+                    return;
+                }
+            }
+            await refreshUnreadMessages();
+        }
+
+        async function refreshUnreadMessages() {
+            if (!noteDatabase || !currentUser) return;
+
+            const { count, error } = await noteDatabase
+                .from('private_messages')
+                .select('id', { count: 'exact', head: true })
+                .eq('recipient_id', currentUser.id)
+                .is('read_at', null);
+
+            if (error) {
+                console.error('Okunmamış mesajlar kontrol edilemedi:', error);
+                return;
+            }
+
+            const badge = document.getElementById('chatUnreadBadge');
+            unreadMessageCount = count || 0;
+            badge.textContent = unreadMessageCount > 99 ? '99+' : String(unreadMessageCount);
+            badge.classList.toggle('hidden', unreadMessageCount === 0);
+            badge.classList.toggle('flex', unreadMessageCount > 0);
+            document.getElementById('chatBubbleButton').setAttribute(
+                'aria-label',
+                unreadMessageCount
+                    ? `Özel mesajları aç, ${unreadMessageCount} okunmamış mesaj`
+                    : 'Özel mesajları aç'
+            );
+        }
+
+        function startChatUnreadRefresh() {
+            if (chatUnreadTimer) window.clearInterval(chatUnreadTimer);
+            refreshUnreadMessages();
+            chatUnreadTimer = window.setInterval(refreshUnreadMessages, 5000);
+        }
+
+        document.getElementById('chatBubbleButton').addEventListener('click', async () => {
+            const chatWindow = document.getElementById('chatWindow');
+            const isOpen = !chatWindow.classList.contains('hidden');
+            if (isOpen) {
+                chatWindow.classList.add('hidden');
+                chatWindow.classList.remove('flex');
+                document.getElementById('chatBubbleButton').setAttribute('aria-expanded', 'false');
+                if (chatRefreshTimer) {
+                    window.clearInterval(chatRefreshTimer);
+                    chatRefreshTimer = null;
+                }
+                return;
+            }
+
+            if (!currentUser) {
+                openAccountModal();
+                setChatStatus('Mesajlaşmak için önce giriş yap.', true);
+                return;
+            }
+
+            chatWindow.classList.remove('hidden');
+            chatWindow.classList.add('flex');
+            document.getElementById('chatBubbleButton').setAttribute('aria-expanded', 'true');
+            showChatFriendList();
+            await refreshUnreadMessages();
+            await loadChatFriends();
+        });
+
+        document.getElementById('closeChatWindow').addEventListener('click', () => {
+            document.getElementById('chatWindow').classList.add('hidden');
+            document.getElementById('chatWindow').classList.remove('flex');
+            document.getElementById('chatBubbleButton').setAttribute('aria-expanded', 'false');
+            if (chatRefreshTimer) {
+                window.clearInterval(chatRefreshTimer);
+                chatRefreshTimer = null;
+            }
+        });
+
+        document.getElementById('chatBackButton').addEventListener('click', async () => {
+            showChatFriendList();
+            await loadChatFriends();
+        });
+
+        document.getElementById('chatMessageForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!noteDatabase || !currentUser || !activeChatFriend) return;
+
+            const input = document.getElementById('chatMessageInput');
+            const sendButton = document.getElementById('sendChatMessageButton');
+            const content = input.value.trim();
+            if (!content) return;
+
+            sendButton.disabled = true;
+            setChatStatus('Mesaj gönderiliyor...');
+            const { error } = await noteDatabase
+                .from('private_messages')
+                .insert({
+                    sender_id: currentUser.id,
+                    recipient_id: activeChatFriend.user_id,
+                    content
+                });
+            sendButton.disabled = false;
+
+            if (error) {
+                console.error('Mesaj gönderilemedi:', error);
+                setChatStatus('Mesaj gönderilemedi. Arkadaşlığın devam ettiğini ve SQL kurulumunu kontrol et.', true);
+                return;
+            }
+
+            input.value = '';
+            await loadChatMessages();
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        });
+
+        document.getElementById('chatMessageInput').addEventListener('keydown', event => {
+            if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+                event.preventDefault();
+                document.getElementById('chatMessageForm').requestSubmit();
+            }
+        });
+
+        document.getElementById('friendSearchForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!noteDatabase || !currentUser) return;
+
+            const results = document.getElementById('friendSearchResults');
+            const searchButton = document.getElementById('friendSearchButton');
+            const query = document.getElementById('friendSearchInput').value.trim();
+            results.replaceChildren();
+            if (!query || !document.getElementById('friendSearchInput').checkValidity()) {
+                results.textContent = 'Geçerli bir e-posta adresi yaz.';
+                return;
+            }
+
+            searchButton.disabled = true;
+            results.textContent = 'E-posta adresi kontrol ediliyor...';
+            let profiles;
+            let error;
+            try {
+                ({ data: profiles, error } = await noteDatabase.rpc('find_member_by_email', {
+                    p_email: query
+                }));
+            } catch (requestError) {
+                error = requestError;
+            } finally {
+                searchButton.disabled = false;
+            }
+
+            if (error) {
+                console.error('Üye araması başarısız:', error);
+                const errorCode = error.code ? ` (${error.code})` : '';
+                results.textContent = error.code === 'PGRST202'
+                    ? 'E-posta arama fonksiyonu Supabase veritabanında bulunamadı. Güncel supabase-setup.sql dosyasını SQL Editor’da tamamen çalıştır, ardından sayfayı yenile.'
+                    : `E-posta ile üye bulunamadı${errorCode}: ${error.message || 'Supabase kurulumu güncel olmayabilir.'}`;
+                return;
+            }
+
+            results.replaceChildren();
+            if (!profiles?.length) {
+                results.textContent = 'Bu e-posta adresiyle kayıtlı başka bir üye bulunamadı.';
+                return;
+            }
+
+            profiles.forEach(profile => {
+                friendProfiles.set(profile.user_id, profile);
+                const relation = friendRequests.find(request =>
+                    (request.sender_id === currentUser.id && request.recipient_id === profile.user_id) ||
+                    (request.sender_id === profile.user_id && request.recipient_id === currentUser.id)
+                );
+                let buttonLabel = 'Arkadaş ekle';
+                let action = () => sendFriendRequest(profile, query);
+                let style = 'border-roseGold/30 text-charcoal hover:bg-white';
+
+                if (relation?.status === 'accepted') {
+                    buttonLabel = 'Arkadaşsınız';
+                    action = null;
+                    style = 'border-roseGold/20 text-warmGray';
+                } else if (relation?.status === 'pending' && relation.sender_id === currentUser.id) {
+                    buttonLabel = 'İstek gönderildi';
+                    action = null;
+                    style = 'border-roseGold/20 text-warmGray';
+                } else if (relation?.status === 'pending') {
+                    buttonLabel = 'İsteği kabul et';
+                    action = () => updateFriendRequest(relation.id, 'accepted');
+                    style = 'border-roseGold/30 text-charcoal hover:bg-white';
+                }
+
+                appendMemberRow(results, profile, buttonLabel, action, style);
+            });
+        });
+
+        async function sendFriendRequest(profile, email) {
+            const results = document.getElementById('friendSearchResults');
+            results.setAttribute('aria-busy', 'true');
+            let createdRequest;
+            let error;
+            try {
+                const { data, error: requestError } = await noteDatabase.rpc('send_friend_request_by_email', {
+                    p_email: email
+                });
+                createdRequest = data?.[0];
+                error = requestError;
+            } catch (requestError) {
+                error = requestError;
+            } finally {
+                results.removeAttribute('aria-busy');
+            }
+
+            if (error) {
+                console.error('Arkadaşlık isteği gönderilemedi:', error);
+                const errorCode = error.code ? ` (${error.code})` : '';
+                results.textContent = `İstek gönderilemedi${errorCode}: ${error.message || 'Bilinmeyen bir veritabanı hatası.'}`;
+                await loadFriends();
+                return;
+            }
+
+            if (!createdRequest) {
+                results.textContent = 'İstek oluşturulamadı. Lütfen istek listesini yenileyip tekrar dene.';
+                return;
+            }
+
+            await loadFriends();
+            results.textContent = `${createdRequest.display_name} profiline arkadaşlık isteği gönderildi. İstek, e-posta adresiyle eşleşen hesaba iletildi.`;
+        }
+
+        function applyTheme(theme) {
+            const isDark = theme === 'dark';
+            document.body.classList.toggle('dark-theme', isDark);
+            const themeButton = document.getElementById('themeToggleButton');
+            themeButton.setAttribute('aria-pressed', String(isDark));
+            themeButton.innerHTML = isDark
+                ? '<i class="fa-regular fa-sun text-roseGold mr-1"></i> Açık temayı aç'
+                : '<i class="fa-regular fa-moon text-roseGold mr-1"></i> Koyu temayı aç';
+            document.getElementById('themePreferenceLabel').textContent = isDark ? 'Koyu tema' : 'Açık tema';
+        }
+
+        function updateSignedInState(user) {
+            currentUser = user;
+            const isSignedIn = Boolean(user);
+            const friendRequestBadge = document.getElementById('friendRequestBadge');
+            if (!isSignedIn) {
+                friendRequestBadge.textContent = '0';
+                friendRequestBadge.classList.add('hidden');
+                if (friendRequestBadgeTimer) {
+                    window.clearInterval(friendRequestBadgeTimer);
+                    friendRequestBadgeTimer = null;
+                }
+                stopFriendRefresh();
+            } else {
+                startChatUnreadRefresh();
+                refreshFriendRequestBadge();
+                if (!friendRequestBadgeTimer) {
+                    friendRequestBadgeTimer = window.setInterval(refreshFriendRequestBadge, 30000);
+                }
+            }
+            if (!isSignedIn) {
+                if (chatUnreadTimer) {
+                    window.clearInterval(chatUnreadTimer);
+                    chatUnreadTimer = null;
+                }
+                unreadMessageCount = 0;
+                const chatUnreadBadge = document.getElementById('chatUnreadBadge');
+                chatUnreadBadge.textContent = '0';
+                chatUnreadBadge.classList.add('hidden');
+                chatUnreadBadge.classList.remove('flex');
+                activeChatFriend = null;
+                if (chatRefreshTimer) {
+                    window.clearInterval(chatRefreshTimer);
+                    chatRefreshTimer = null;
+                }
+                document.getElementById('chatWindow').classList.add('hidden');
+                document.getElementById('chatWindow').classList.remove('flex');
+                document.getElementById('chatBubbleButton').setAttribute('aria-expanded', 'false');
+            }
+            const accountButtonLabel = document.getElementById('accountButtonLabel');
+            const storyFields = storyForm.querySelectorAll('input, textarea, button[type="submit"]');
+            const storyFormStatus = document.getElementById('storyFormStatus');
+            const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Hesabım';
+
+            accountButtonLabel.textContent = isSignedIn
+                ? (isAdminUser(user) ? 'Hesabım' : displayName)
+                : 'Giriş';
+            document.getElementById('accountButton').setAttribute(
+                'aria-label',
+                isSignedIn ? `${displayName} hesabını aç` : 'Giriş yap veya hesap bilgilerini aç'
+            );
+            document.getElementById('accountEyebrow').textContent = isSignedIn ? 'Üye Alanı' : 'Hikâye Paylaşımı';
+            document.getElementById('accountModalTitle').textContent = isSignedIn ? 'Hesabım' : (accountMode === 'signup' ? 'Hesabını Oluştur' : 'Hesabına Giriş Yap');
+            document.getElementById('accountForm').classList.toggle('hidden', isSignedIn);
+            document.getElementById('accountModePrompt').classList.toggle('hidden', isSignedIn);
+            document.getElementById('accountSignedIn').classList.toggle('hidden', !isSignedIn);
+            document.getElementById('signedInLabel').textContent = isSignedIn
+                ? `Merhaba, ${user.user_metadata?.display_name || user.email.split('@')[0]}`
+                : '';
+            document.getElementById('profileDisplayName').value = user?.user_metadata?.display_name || '';
+            document.getElementById('profileBio').value = user?.user_metadata?.bio || '';
+            document.getElementById('accountEmailLabel').textContent = user?.email || '';
+            const profilePhotoUrl = user?.user_metadata?.avatar_url;
+            const profilePhotoPreview = document.getElementById('profilePhotoPreview');
+            profilePhotoPreview.classList.toggle('hidden', !profilePhotoUrl);
+            profilePhotoPreview.src = profilePhotoUrl || '';
+            document.getElementById('profilePhotoPlaceholder').classList.toggle('hidden', Boolean(profilePhotoUrl));
+            applyTheme(user?.user_metadata?.theme);
+
+            storyFields.forEach(field => {
+                field.disabled = !isSignedIn;
+            });
+            storyFormStatus.textContent = isSignedIn
+                ? 'Hikâyeni yazıp toplulukla paylaşabilirsin.'
+                : 'Hikâye yazmak için önce giriş yap.';
+            storyFormStatus.classList.remove('text-roseGold');
+        }
+
+        function appendStory(story, prepend = false) {
+            const card = document.createElement('article');
+            card.className = 'glass-card rounded-2xl p-6 md:p-8 border border-roseGold/20';
+
+            const authorLine = document.createElement('p');
+            authorLine.className = 'text-xs font-medium uppercase tracking-wider text-roseGold';
+            authorLine.textContent = story.author;
+
+            const title = document.createElement('h3');
+            title.className = 'font-serif text-2xl text-charcoal mt-2';
+            title.textContent = story.title;
+
+            const content = document.createElement('p');
+            content.className = 'text-sm text-warmGray leading-relaxed whitespace-pre-wrap break-words mt-4';
+            content.textContent = story.content;
+
+            const date = document.createElement('time');
+            date.className = 'block text-xs text-warmGray/80 mt-5';
+            date.dateTime = story.created_at;
+            date.textContent = new Intl.DateTimeFormat('tr-TR', {
+                dateStyle: 'medium'
+            }).format(new Date(story.created_at));
+
+            card.append(authorLine, title, content, date);
+            const storiesList = document.getElementById('storiesList');
+            if (prepend) {
+                storiesList.prepend(card);
+            } else {
+                storiesList.appendChild(card);
+            }
+        }
+
+        async function loadStories() {
+            const storiesStatus = document.getElementById('storiesStatus');
+            const storiesList = document.getElementById('storiesList');
+
+            if (!noteDatabase) {
+                storiesStatus.textContent = 'Hikâyeler Supabase bağlantısı yapılandırıldıktan sonra görüntülenecek.';
+                return;
+            }
+
+            storiesStatus.textContent = 'Hikâyeler yükleniyor...';
+            const { data, error } = await noteDatabase
+                .from('community_stories')
+                .select('id, author, title, content, created_at')
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) {
+                console.error('Hikâyeler yüklenemedi:', error);
+                storiesStatus.textContent = 'Hikâyeler yüklenemedi. Site yöneticisi Supabase tablo ve erişim kurallarını kontrol etmeli.';
+                return;
+            }
+
+            storiesList.replaceChildren();
+            data.forEach(appendStory);
+            storiesStatus.textContent = data.length ? '' : 'Henüz paylaşılmış bir hikâye yok. İlk hikâyeyi sen paylaş!';
+        }
+
+        function setManagedText(element, value) {
+            if (element && typeof value === 'string') element.textContent = value;
+        }
+
+        function renderManagedGallery(items) {
+            const container = document.querySelector('#gallery .grid.grid-cols-1');
+            if (!container) return;
+            container.replaceChildren();
+
+            items.forEach(item => {
+                const card = document.createElement('article');
+                card.dataset.galleryCategory = item.category;
+                card.className = 'perspective-1000 group cursor-pointer';
+                card.setAttribute('role', 'button');
+                card.setAttribute('tabindex', '0');
+                card.setAttribute('aria-label', `${item.caption || item.alt || 'Anı'} kartını çevir`);
+                const flip = () => flipCard(card);
+                card.addEventListener('click', flip);
+                card.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        flip();
+                    }
+                });
+
+                const frame = document.createElement('div');
+                frame.className = 'transform-style-3d relative h-[23rem] w-full rounded-2xl';
+                const front = document.createElement('div');
+                front.className = 'absolute inset-0 backface-hidden glass-card rounded-2xl overflow-hidden';
+                const imageWrap = document.createElement('div');
+                imageWrap.className = 'relative h-80 overflow-hidden bg-champagne';
+                const image = document.createElement('img');
+                image.src = item.image_url;
+                image.alt = item.alt || '';
+                image.loading = 'lazy';
+                image.className = 'h-full w-full object-cover transition-transform duration-700 group-hover:scale-105';
+                imageWrap.appendChild(image);
+                const captionWrap = document.createElement('div');
+                captionWrap.className = 'p-5';
+                const caption = document.createElement('p');
+                caption.className = 'text-xs tracking-wide text-warmGray';
+                caption.textContent = item.caption || '';
+                captionWrap.appendChild(caption);
+                front.append(imageWrap, captionWrap);
+
+                const back = document.createElement('div');
+                back.className = 'absolute inset-0 backface-hidden rotate-y-180 glass-card rounded-2xl border border-roseGold/30 p-6 flex flex-col items-center justify-center text-center';
+                const icon = document.createElement('i');
+                icon.className = `fa-solid ${item.category === 'kahve' ? 'fa-mug-hot' : item.category === 'yol' ? 'fa-route' : 'fa-sparkles'} text-roseGold text-2xl mb-5`;
+                const quote = document.createElement('p');
+                quote.className = 'font-serif italic text-xl text-charcoal leading-relaxed';
+                quote.textContent = `“${item.quote || ''}”`;
+                back.append(icon, quote);
+                frame.append(front, back);
+                card.appendChild(frame);
+                container.appendChild(card);
+            });
+            const selectedFilter = document.querySelector('[data-gallery-filter][aria-pressed="true"]')?.dataset.galleryFilter || 'ilham';
+            container.querySelectorAll('[data-gallery-category]').forEach(card => {
+                card.hidden = selectedFilter !== 'all' && card.dataset.galleryCategory !== selectedFilter;
+            });
+        }
+
+        function renderManagedFavorites(items) {
+            const container = document.querySelector('#favorites .grid > div:first-child');
+            if (!container) return;
+            container.replaceChildren();
+            items.forEach(item => {
+                const card = document.createElement('article');
+                card.className = 'glass-card p-6 rounded-2xl border border-roseGold/20 flex items-center gap-5 hover:border-roseGold/40 transition-colors';
+                const iconWrap = document.createElement('div');
+                iconWrap.className = 'w-14 h-14 rounded-2xl bg-rose-100 flex items-center justify-center text-roseGold text-2xl shrink-0';
+                const icon = document.createElement('i');
+                icon.className = item.icon || 'fa-solid fa-heart';
+                iconWrap.appendChild(icon);
+                const text = document.createElement('div');
+                const label = document.createElement('span');
+                label.className = 'text-xs text-roseGold font-medium uppercase tracking-wider';
+                label.textContent = item.label || '';
+                const title = document.createElement('h4');
+                title.className = 'font-serif text-xl text-charcoal font-semibold';
+                title.textContent = item.title || '';
+                const description = document.createElement('p');
+                description.className = 'text-xs text-warmGray mt-1';
+                description.textContent = item.description || '';
+                text.append(label, title, description);
+                card.append(iconWrap, text);
+                container.appendChild(card);
+            });
+        }
+
+        function renderManagedMusic(items) {
+            const container = document.querySelector('#favorites .grid > div:nth-child(2) .space-y-6 > .space-y-4');
+            if (!container) return;
+            const heading = container.querySelector('h3');
+            const list = heading?.nextElementSibling;
+            if (!list) return;
+            list.replaceChildren();
+            items.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border border-roseGold/15 bg-white/40 p-4';
+                const title = document.createElement('p');
+                title.className = 'text-sm font-medium text-charcoal';
+                title.textContent = item.title || '';
+                const actions = document.createElement('div');
+                actions.className = 'flex shrink-0 items-center gap-2';
+                const link = document.createElement('a');
+                link.href = item.url;
+                link.target = '_blank';
+                link.rel = 'noreferrer';
+                link.className = 'inline-flex items-center gap-2 rounded-full bg-roseGold px-4 py-2 text-xs font-medium text-white hover:bg-roseGold/90 transition-colors';
+                link.textContent = 'YouTube Music';
+                const icon = document.createElement('i');
+                icon.className = 'fa-brands fa-youtube';
+                link.prepend(icon);
+                actions.appendChild(link);
+                row.append(title, actions);
+                list.appendChild(row);
+            });
+        }
+
+        function renderManagedInspirationCards(items) {
+            const container = document.getElementById('notesContainer');
+            if (!container) return;
+            container.replaceChildren();
+            items.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'perspective-1000 h-64 cursor-pointer group';
+                card.addEventListener('click', () => flipCard(card));
+                const frame = document.createElement('div');
+                frame.className = 'transform-style-3d relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all';
+                const front = document.createElement('div');
+                front.className = 'absolute inset-0 p-6 flex flex-col justify-between backface-hidden';
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-center text-roseGold';
+                const icon = document.createElement('i');
+                icon.className = `${item.icon || 'fa-solid fa-sparkles'} text-xl`;
+                const category = document.createElement('span');
+                category.className = 'text-xs font-mono uppercase tracking-wider';
+                category.textContent = `${String(index + 1).padStart(2, '0')} / ${item.category || 'İlham'}`;
+                header.append(icon, category);
+                const titleWrap = document.createElement('div');
+                titleWrap.className = 'text-center';
+                const title = document.createElement('h3');
+                title.className = 'font-serif text-2xl text-charcoal';
+                title.textContent = item.title || '';
+                const hint = document.createElement('p');
+                hint.className = 'text-xs text-warmGray mt-2';
+                hint.textContent = 'Kartı çevirmek için tıklayın';
+                titleWrap.append(title, hint);
+                const turn = document.createElement('div');
+                turn.className = 'text-right';
+                const turnIcon = document.createElement('i');
+                turnIcon.className = 'fa-solid fa-arrow-rotate-right text-warmGray/60 group-hover:text-roseGold transition-colors';
+                turn.appendChild(turnIcon);
+                front.append(header, titleWrap, turn);
+
+                const back = document.createElement('div');
+                back.className = 'absolute inset-0 p-6 flex flex-col justify-between backface-hidden rotate-y-180 bg-champagne/80 rounded-2xl border border-roseGold/30';
+                const quote = document.createElement('p');
+                quote.className = 'font-serif italic text-charcoal text-lg leading-relaxed text-center my-auto';
+                quote.textContent = `“${item.quote || ''}”`;
+                const attribution = document.createElement('span');
+                attribution.className = 'text-xs text-roseGold font-semibold text-center';
+                attribution.textContent = `— ${item.attribution || ''}`;
+                back.append(quote, attribution);
+                frame.append(front, back);
+                card.appendChild(frame);
+                container.appendChild(card);
+            });
+        }
+
+        function renderManagedSiteTexts(items) {
+            const selectors = {
+                about: { label: '#about > span', title: '#about h1', description: '#about > p' },
+                notes: { label: '#notes .text-center > span', title: '#notes h2', description: '#notes .text-center > p' },
+                stories: { label: '#stories .text-center > span', title: '#stories h2', description: '#stories .text-center > p' },
+                gallery: { label: '#gallery .text-center > span', title: '#gallery h2', description: '#gallery .text-center > p' },
+                favorites: { label: '#favorites .text-center > span', title: '#favorites h2', description: '#favorites .text-center > p' },
+                daily: { label: null, title: null, description: null }
+            };
+            items.forEach(item => {
+                const target = selectors[item.section];
+                if (!target) return;
+                if (item.section === 'daily') {
+                    const heading = [...document.querySelectorAll('h2')].find(node => node.textContent.trim() === 'Günün Tebessümü');
+                    if (heading) {
+                        setManagedText(heading, item.title);
+                        setManagedText(heading.parentElement.querySelector('p'), item.description);
+                    }
+                    return;
+                }
+                setManagedText(document.querySelector(target.label), item.label);
+                const heading = document.querySelector(target.title);
+                if (item.section === 'about' && heading && item.title.includes('Beyza Özcan')) {
+                    const nameStart = item.title.indexOf('Beyza Özcan');
+                    const name = document.createElement('span');
+                    name.className = 'italic font-semibold text-roseGold';
+                    name.textContent = item.title.slice(nameStart);
+                    heading.replaceChildren(
+                        document.createTextNode(item.title.slice(0, nameStart)),
+                        document.createElement('br'),
+                        name
+                    );
+                } else {
+                    setManagedText(heading, item.title);
+                }
+                setManagedText(document.querySelector(target.description), item.description);
+            });
+        }
+
+        async function loadManagedSiteContent() {
+            if (!noteDatabase) return;
+            const { data, error } = await noteDatabase
+                .from('site_content')
+                .select('content_key, content_value');
+            if (error) {
+                console.error('Yönetilen site içerikleri yüklenemedi:', error);
+                return;
+            }
+            managedSiteContent = Object.fromEntries(data.map(row => [row.content_key, row.content_value]));
+            if (Array.isArray(managedSiteContent.gallery)) renderManagedGallery(managedSiteContent.gallery);
+            if (Array.isArray(managedSiteContent.favorites)) renderManagedFavorites(managedSiteContent.favorites);
+            if (Array.isArray(managedSiteContent.music)) renderManagedMusic(managedSiteContent.music);
+            if (Array.isArray(managedSiteContent.inspiration_cards)) renderManagedInspirationCards(managedSiteContent.inspiration_cards);
+            if (Array.isArray(managedSiteContent.site_texts)) renderManagedSiteTexts(managedSiteContent.site_texts);
+        }
+
+        document.getElementById('accountButton').addEventListener('click', () => {
+            if (isAdminUser(currentUser)) {
+                window.location.href = 'admin.html';
+                return;
+            }
+            openAccountModal();
+        });
+        document.querySelectorAll('[data-account-tab]').forEach(button => {
+            button.addEventListener('click', () => {
+                setAccountTab(button.dataset.accountTab);
+                if (button.dataset.accountTab === 'friends') {
+                    loadFriends();
+                    startFriendRefresh();
+                } else {
+                    stopFriendRefresh();
+                }
+            });
+        });
+        document.getElementById('refreshFriendsButton').addEventListener('click', loadFriends);
+        document.getElementById('closeAccountModal').addEventListener('click', closeAccountModal);
+        accountModal.addEventListener('click', event => {
+            if (event.target === accountModal) closeAccountModal();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && !accountModal.classList.contains('hidden')) closeAccountModal();
+        });
+        document.getElementById('toggleAccountMode').addEventListener('click', () => {
+            setAccountMode(accountMode === 'signin' ? 'signup' : 'signin');
+        });
+
+        accountForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!noteDatabase) {
+                openAccountModal();
+                return;
+            }
+
+            const email = document.getElementById('accountEmail').value.trim();
+            const password = document.getElementById('accountPassword').value;
+            if (accountMode === 'signup') {
+                const passwordConfirmation = document.getElementById('accountPasswordConfirmation').value;
+                if (password !== passwordConfirmation) {
+                    accountStatus.textContent = 'Yazdığın iki şifre aynı değil. Lütfen kontrol edip tekrar dene.';
+                    accountStatus.classList.add('text-roseGold');
+                    document.getElementById('accountPasswordConfirmation').focus();
+                    return;
+                }
+            }
+
+            const submitButton = document.getElementById('accountSubmitButton');
+            submitButton.disabled = true;
+            accountStatus.textContent = accountMode === 'signup' ? 'Hesap oluşturuluyor...' : 'Giriş yapılıyor...';
+
+            const result = accountMode === 'signup'
+                ? await noteDatabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            display_name: document.getElementById('accountDisplayName').value.trim()
+                        }
+                    }
+                })
+                : await noteDatabase.auth.signInWithPassword({ email, password });
+
+            submitButton.disabled = false;
+            if (result.error) {
+                console.error('Hesap işlemi başarısız:', result.error);
+                accountStatus.textContent = accountMode === 'signup'
+                    ? 'Kayıt oluşturulamadı. Bilgileri kontrol edip tekrar dene.'
+                    : 'Giriş yapılamadı. E-posta ve şifreyi kontrol et.';
+                accountStatus.classList.add('text-roseGold');
+                return;
+            }
+
+            accountStatus.classList.remove('text-roseGold');
+            if (accountMode === 'signup' && !result.data.session) {
+                accountStatus.textContent = 'Kayıt tamamlandı. Hesabını etkinleştirmek için e-posta adresine gönderilen doğrulama bağlantısına tıkla.';
+            } else {
+                if (accountMode === 'signin' && isAdminUser(result.data.user)) {
+                    window.location.href = 'admin.html';
+                    return;
+                }
+                updateSignedInState(result.data.user);
+                if (result.data.session) {
+                    savePublicProfile(result.data.user).catch(error => {
+                        console.error('Üye profili hazırlanamadı:', error);
+                    });
+                }
+                accountStatus.textContent = '';
+                if (accountMode === 'signin') closeAccountModal();
+            }
+            document.getElementById('accountPassword').value = '';
+            document.getElementById('accountPasswordConfirmation').value = '';
+        });
+
+        document.getElementById('profileForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!noteDatabase || !currentUser) return;
+
+            const saveButton = document.getElementById('saveProfileButton');
+            const status = document.getElementById('profileStatus');
+            const displayName = document.getElementById('profileDisplayName').value.trim();
+            const bio = document.getElementById('profileBio').value.trim();
+            if (!displayName) {
+                status.textContent = 'Görünen ad boş bırakılamaz.';
+                return;
+            }
+
+            saveButton.disabled = true;
+            status.textContent = 'Profil kaydediliyor...';
+            const { data, error } = await noteDatabase.auth.updateUser({
+                data: { ...currentUser.user_metadata, display_name: displayName, bio }
+            });
+            saveButton.disabled = false;
+
+            if (error) {
+                console.error('Profil güncellenemedi:', error);
+                status.textContent = 'Profil kaydedilemedi. Lütfen tekrar dene.';
+                status.classList.add('text-roseGold');
+                return;
+            }
+
+            updateSignedInState(data.user);
+            try {
+                await savePublicProfile(data.user);
+            } catch (error) {
+                console.error('Üye profili kaydedilemedi:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'Profilin güncellendi ancak arkadaş aramasına kaydedilemedi. Supabase SQL kurulumunun güncel olduğundan emin ol.';
+                return;
+            }
+            status.classList.remove('text-roseGold');
+            status.textContent = 'Profilin başarıyla kaydedildi.';
+        });
+
+        document.getElementById('uploadProfilePhotoButton').addEventListener('click', async () => {
+            if (!noteDatabase || !currentUser) return;
+
+            const fileInput = document.getElementById('profilePhotoInput');
+            const file = fileInput.files[0];
+            const button = document.getElementById('uploadProfilePhotoButton');
+            const status = document.getElementById('profilePhotoStatus');
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const maxFileSize = 3 * 1024 * 1024;
+
+            if (!file) {
+                status.textContent = 'Önce yüklemek için bir fotoğraf seç.';
+                return;
+            }
+            if (!allowedTypes.includes(file.type)) {
+                status.classList.add('text-roseGold');
+                status.textContent = 'Yalnızca JPG, PNG veya WebP formatındaki fotoğraflar yüklenebilir.';
+                return;
+            }
+            if (file.size > maxFileSize) {
+                status.classList.add('text-roseGold');
+                status.textContent = 'Fotoğraf en fazla 3 MB olabilir.';
+                return;
+            }
+
+            button.disabled = true;
+            status.classList.remove('text-roseGold');
+            status.textContent = 'Fotoğraf yükleniyor...';
+
+            const filePath = `${currentUser.id}/avatar`;
+            const { error: uploadError } = await noteDatabase.storage
+                .from('profile-photos')
+                .upload(filePath, file, {
+                    cacheControl: '0',
+                    contentType: file.type,
+                    upsert: true
+                });
+
+            if (uploadError) {
+                console.error('Profil fotoğrafı yüklenemedi:', uploadError);
+                button.disabled = false;
+                status.classList.add('text-roseGold');
+                status.textContent = 'Fotoğraf yüklenemedi. Supabase Storage kurulumunu ve erişim kurallarını kontrol et.';
+                return;
+            }
+
+            const { data: publicUrlData } = noteDatabase.storage
+                .from('profile-photos')
+                .getPublicUrl(filePath);
+            const avatarUrl = `${publicUrlData.publicUrl}?v=${Date.now()}`;
+            const { data, error: profileError } = await noteDatabase.auth.updateUser({
+                data: { ...currentUser.user_metadata, avatar_url: avatarUrl }
+            });
+            button.disabled = false;
+
+            if (profileError) {
+                console.error('Profil fotoğrafı bağlantısı kaydedilemedi:', profileError);
+                status.classList.add('text-roseGold');
+                status.textContent = 'Fotoğraf yüklendi ancak profile kaydedilemedi. Lütfen tekrar dene.';
+                return;
+            }
+
+            updateSignedInState(data.user);
+            try {
+                await savePublicProfile(data.user);
+            } catch (error) {
+                console.error('Profil fotoğrafı üye kartına kaydedilemedi:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'Fotoğraf yüklendi ancak arkadaş profilinde gösterilemedi. Supabase SQL kurulumunu kontrol et.';
+                return;
+            }
+            fileInput.value = '';
+            status.classList.remove('text-roseGold');
+            status.textContent = 'Profil fotoğrafın başarıyla güncellendi.';
+        });
+
+        document.getElementById('themeToggleButton').addEventListener('click', async () => {
+            if (!noteDatabase || !currentUser) return;
+
+            const button = document.getElementById('themeToggleButton');
+            const status = document.getElementById('themeStatus');
+            const nextTheme = currentUser.user_metadata?.theme === 'dark' ? 'light' : 'dark';
+            button.disabled = true;
+            status.textContent = 'Tema tercihi kaydediliyor...';
+
+            const { data, error } = await noteDatabase.auth.updateUser({
+                data: { ...currentUser.user_metadata, theme: nextTheme }
+            });
+            button.disabled = false;
+
+            if (error) {
+                console.error('Tema tercihi kaydedilemedi:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'Tema tercihi kaydedilemedi. Lütfen tekrar dene.';
+                return;
+            }
+
+            updateSignedInState(data.user);
+            status.classList.remove('text-roseGold');
+            status.textContent = 'Tema tercihin kaydedildi.';
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!noteDatabase || !currentUser) return;
+
+            const currentPasswordInput = document.getElementById('currentAccountPassword');
+            const passwordInput = document.getElementById('newAccountPassword');
+            const changeButton = document.getElementById('changePasswordButton');
+            const status = document.getElementById('settingsStatus');
+            changeButton.disabled = true;
+            status.textContent = 'Mevcut şifre doğrulanıyor...';
+
+            const { error: verificationError } = await noteDatabase.auth.signInWithPassword({
+                email: currentUser.email,
+                password: currentPasswordInput.value
+            });
+
+            if (verificationError) {
+                console.error('Mevcut şifre doğrulanamadı:', verificationError);
+                changeButton.disabled = false;
+                status.classList.add('text-roseGold');
+                status.textContent = 'Mevcut şifre doğru değil. Şifreni hatırlamıyorsan “Şifremi unuttum” bağlantısını kullan.';
+                return;
+            }
+
+            status.textContent = 'Yeni şifre kaydediliyor...';
+            const { error: updateError } = await noteDatabase.auth.updateUser({ password: passwordInput.value });
+            changeButton.disabled = false;
+
+            if (updateError) {
+                console.error('Şifre güncellenemedi:', updateError);
+                status.textContent = 'Şifre güncellenemedi. Lütfen tekrar dene.';
+                status.classList.add('text-roseGold');
+                return;
+            }
+
+            currentPasswordInput.value = '';
+            passwordInput.value = '';
+            status.classList.remove('text-roseGold');
+            status.textContent = 'Şifren başarıyla güncellendi.';
+        });
+
+        document.getElementById('forgotPasswordButton').addEventListener('click', async () => {
+            if (!noteDatabase || !currentUser?.email) return;
+
+            const status = document.getElementById('settingsStatus');
+            const button = document.getElementById('forgotPasswordButton');
+            button.disabled = true;
+            status.textContent = 'Şifre sıfırlama e-postası gönderiliyor...';
+
+            const redirectUrl = new URL(window.location.href);
+            redirectUrl.hash = '';
+            const options = /^https?:$/.test(window.location.protocol)
+                ? { redirectTo: redirectUrl.href }
+                : undefined;
+            const { error } = await noteDatabase.auth.resetPasswordForEmail(currentUser.email, options);
+            button.disabled = false;
+
+            if (error) {
+                console.error('Şifre sıfırlama e-postası gönderilemedi:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'E-posta gönderilemedi. Supabase e-posta ayarlarını ve yönlendirme adreslerini kontrol edip tekrar dene.';
+                return;
+            }
+
+            status.classList.remove('text-roseGold');
+            status.textContent = `Şifre değiştirme bağlantısı ${currentUser.email} adresine gönderildi.`;
+        });
+
+        document.getElementById('passwordRecoveryForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            if (!noteDatabase || !currentUser) return;
+
+            const passwordInput = document.getElementById('recoveryNewPassword');
+            const button = document.getElementById('recoveryPasswordButton');
+            const status = document.getElementById('recoveryStatus');
+            button.disabled = true;
+            status.textContent = 'Yeni şifre kaydediliyor...';
+
+            const { error } = await noteDatabase.auth.updateUser({ password: passwordInput.value });
+            button.disabled = false;
+
+            if (error) {
+                console.error('Şifre sıfırlanamadı:', error);
+                status.classList.add('text-roseGold');
+                status.textContent = 'Şifre kaydedilemedi. E-posta bağlantısının süresi dolmuş olabilir; yeniden şifre sıfırlama bağlantısı iste.';
+                return;
+            }
+
+            passwordInput.value = '';
+            passwordRecoveryMode = false;
+            document.getElementById('passwordForm').classList.remove('hidden');
+            document.getElementById('forgotPasswordButton').classList.remove('hidden');
+            document.getElementById('passwordRecoveryForm').classList.add('hidden');
+            document.getElementById('settingsStatus').textContent = 'Şifren başarıyla güncellendi.';
+            status.classList.remove('text-roseGold');
+            status.textContent = '';
+        });
+
+        document.getElementById('signOutButton').addEventListener('click', async () => {
+            const { error } = await noteDatabase.auth.signOut();
+            if (error) {
+                console.error('Çıkış yapılamadı:', error);
+                accountStatus.textContent = 'Çıkış yapılamadı. Lütfen tekrar dene.';
+                return;
+            }
+            updateSignedInState(null);
+            document.getElementById('profileStatus').textContent = '';
+            document.getElementById('settingsStatus').textContent = '';
+            passwordRecoveryMode = false;
+            document.getElementById('passwordForm').classList.remove('hidden');
+            document.getElementById('forgotPasswordButton').classList.remove('hidden');
+            document.getElementById('passwordRecoveryForm').classList.add('hidden');
+            setAccountMode('signin');
+        });
+
+        storyForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const status = document.getElementById('storyFormStatus');
+            const submitButton = document.getElementById('storySubmitButton');
+            if (!currentUser) {
+                status.textContent = 'Hikâye paylaşmak için önce giriş yapmalısın.';
+                openAccountModal();
+                return;
+            }
+
+            const title = document.getElementById('storyTitle').value.trim();
+            const content = document.getElementById('storyContent').value.trim();
+            if (!title || !content) return;
+
+            submitButton.disabled = true;
+            status.textContent = 'Hikâyen paylaşılıyor...';
+            try {
+                const author = currentUser.user_metadata?.display_name || currentUser.email.split('@')[0];
+                const { error } = await noteDatabase
+                    .from('community_stories')
+                    .insert({
+                        user_id: currentUser.id,
+                        author,
+                        title,
+                        content
+                    });
+
+                if (error) throw error;
+                appendStory({
+                    author,
+                    title,
+                    content,
+                    created_at: new Date().toISOString()
+                }, true);
+                storyForm.reset();
+                status.textContent = 'Hikâyen paylaşıldı, teşekkürler!';
+            } catch (error) {
+                console.error('Hikâye paylaşılamadı:', error);
+                status.textContent = 'Hikâye paylaşılamadı. Lütfen daha sonra tekrar dene.';
+                status.classList.add('text-roseGold');
+            } finally {
+                submitButton.disabled = false;
+            }
+        });
+
+        if (noteDatabase) {
+            noteDatabase.auth.getSession().then(({ data, error }) => {
+                if (error) {
+                    console.error('Oturum alınamadı:', error);
+                    return;
+                }
+                updateSignedInState(data.session?.user || null);
+                if (data.session?.user) {
+                    savePublicProfile(data.session.user).catch(error => {
+                        console.error('Üye profili hazırlanamadı:', error);
+                    });
+                }
+            });
+            noteDatabase.auth.onAuthStateChange((event, session) => {
+                updateSignedInState(session?.user || null);
+                if (event === 'PASSWORD_RECOVERY') {
+                    passwordRecoveryMode = true;
+                    openAccountModal();
+                    setAccountTab('settings');
+                    document.getElementById('passwordForm').classList.add('hidden');
+                    document.getElementById('forgotPasswordButton').classList.add('hidden');
+                    document.getElementById('passwordRecoveryForm').classList.remove('hidden');
+                    document.getElementById('recoveryStatus').textContent = '';
+                    document.getElementById('recoveryNewPassword').focus();
+                } else if (!session && passwordRecoveryMode) {
+                    passwordRecoveryMode = false;
+                    document.getElementById('passwordForm').classList.remove('hidden');
+                    document.getElementById('forgotPasswordButton').classList.remove('hidden');
+                    document.getElementById('passwordRecoveryForm').classList.add('hidden');
+                }
+            });
+        }
+        loadStories();
+        loadManagedSiteContent();
+
+        /* 1. FLOATING PARTICLES CANVAS */
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray = [];
+        const numberOfParticles = 35;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.speedY = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(212, 163, 115, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+        initParticles();
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particlesArray.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        /* 2. CARD FLIP INTERACTION */
+        function flipCard(cardContainer) {
+            const innerCard = cardContainer.querySelector('.transform-style-3d');
+            const isFlipped = innerCard.classList.contains('rotate-y-180');
+
+            document.querySelectorAll('.transform-style-3d.rotate-y-180').forEach(openCard => {
+                if (openCard !== innerCard) openCard.classList.remove('rotate-y-180');
+            });
+
+            innerCard.classList.toggle('rotate-y-180', !isFlipped);
+        }
+
+        /* 3. ADD NEW NOTE FUNCTIONALITY */
+        async function addNewNote(event) {
+            event.preventDefault();
+            const authorInput = document.getElementById('noteAuthor');
+            const contentInput = document.getElementById('noteContent');
+            const statusElement = document.getElementById('noteFormStatus');
+            const submitButton = event.currentTarget.querySelector('button[type="submit"]');
+
+            const author = authorInput.value.trim();
+            const content = contentInput.value.trim();
+
+            if (!author || !content || !statusElement || !submitButton) return;
+            if (!noteDatabase) {
+                statusElement.textContent = 'Notlar şu anda kaydedilemiyor. Site yöneticisinin Supabase bağlantısını yapılandırması gerekiyor.';
+                statusElement.classList.add('text-roseGold');
+                return;
+            }
+
+            submitButton.disabled = true;
+            statusElement.textContent = 'Notunuz kaydediliyor...';
+
+            try {
+                const { error } = await noteDatabase
+                    .from('site_notes')
+                    .insert({ author, content });
+
+                if (error) throw error;
+
+                const container = document.getElementById('notesContainer');
+                const noteCount = container.children.length + 1;
+                const newCard = document.createElement('div');
+                newCard.className = 'h-64';
+                newCard.innerHTML = `
+                    <div class="relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm">
+                        <div class="flex justify-between items-center text-roseGold">
+                            <i class="fa-solid fa-heart text-xl"></i>
+                            <span class="text-xs font-mono uppercase tracking-wider">${String(noteCount).padStart(2, '0')} / Yeni Not</span>
+                        </div>
+                        <h3 class="font-serif text-2xl text-charcoal text-center"></h3>
+                        <div class="text-right">
+                            <i class="fa-solid fa-envelope text-warmGray/60"></i>
+                        </div>
+                    </div>
+                `;
+                newCard.querySelector('h3').textContent = author;
+                container.appendChild(newCard);
+
+                authorInput.value = '';
+                contentInput.value = '';
+                statusElement.textContent = 'Notunuz başarıyla kaydedildi. Teşekkürler!';
+                statusElement.classList.remove('text-roseGold');
+
+                newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } catch (error) {
+                console.error('Not kaydedilemedi:', error);
+                statusElement.textContent = 'Not kaydedilemedi. Lütfen daha sonra tekrar deneyin.';
+                statusElement.classList.add('text-roseGold');
+            } finally {
+                submitButton.disabled = false;
+            }
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        /* 4. "GÜNÜN TEBESSÜMÜ" COMPLIMENT GENERATOR */
+        const compliments = [
+            "Bugün harika şeylerin başlangıcı olabilir. Tıpkı senin etrafa yaydığın pozitif enerji gibi!",
+            "Zarafetin ve samimiyetin, etrafındaki her anı daha da güzelleştiriyor.",
+            "Gülüşün, en gri günleri bile aydınlatabilecek bir sıcaklığa sahip.",
+            "İncelikli düşüncelerin ve estetik bakış açın hayatı daha anlamlı kılıyor.",
+            "Kendine vakit ayırmayı ve hayatın küçük güzelliklerinin tadını çıkarmayı unutma!",
+            "Etrafındaki insanlara verdiğin huzur ve güven paha biçilemez.",
+            "Işıltın hiç sönmesin; bugün senin günün!",
+            "Küçük adımlar da seni güzel başlangıçlara taşır; kendine güven.",
+            "Kendine gösterdiğin şefkat, en güzel başarılarından biridir.",
+            "Her yeni gün, içindeki güzellikleri yeniden keşfetmen için bir fırsat.",
+            "Yolun bazen yavaş ilerlese de, attığın her adımın kıymeti var.",
+            "Senin kendine özgü ışığın, bulunduğun yeri güzelleştirmeye yeter.",
+            "Bugün her şeyi çözmek zorunda değilsin; bir nefes al ve kendine zaman tanı.",
+            "Hayallerine doğru attığın cesur bir adım, yarının en güzel hatırası olabilir.",
+            "İçindeki zarafet, en sıradan anlara bile anlam katıyor.",
+            "Güzel şeyler bazen sessizce, tam da umudunu koruduğun anda filizlenir.",
+            "Kendin olduğun halinle değerlisin; bunu bugün kendine hatırlat.",
+            "Kalbinin güzelliği, dokunduğun hayatlarda iz bırakıyor.",
+            "Bugün kendin için de güzel bir şey yapmayı ihmal etme.",
+            "Her mevsimin bir zamanı var; sen de kendi vaktinde çiçek açacaksın.",
+            "İçindeki umut, en uzun yolları bile aydınlatabilir.",
+            "Dün geride kaldı; bugün yeni bir başlangıç için sana ait.",
+            "Nazik kalbin ve güçlü duruşun, seni sen yapan en güzel yanlardan.",
+            "Kendine inandığında, önündeki yollar biraz daha aydınlanır.",
+            "Huzur bazen büyük cevaplarda değil, kendine verdiğin küçük molalarda saklıdır.",
+            "Işığını başkalarıyla paylaşırken kendi kalbini de aydınlatmayı unutma.",
+            "Bugün elinden gelenin en iyisi yeter; kendinle gurur duy.",
+            "Güzellik, dünyaya baktığın incelikli gözlerde saklı.",
+            "Umut ettiğin şeylere doğru ilerlemek için mükemmel zamanı beklemek zorunda değilsin.",
+            "Varlığın, sevdiklerinin gününe sandığından daha çok güzellik katıyor.",
+            "Her güzel hikâye, kendine inanmayı seçtiğin bir anla başlayabilir.",
+            "Gündelik hayatın karmaşasında kendi içindeki zarafeti korumak en büyük sanattır.",
+            "Taze çekilmiş bir kahve kokusu ve sevdiğin bir melodi... Bazen tüm dünya bundan ibarettir.",
+            "Etrafına yaydığın samimi enerji, çevrendekilerin gününü aydınlatmaya yeter."
+        ];
+
+        let currentComplimentIndex = 0;
+
+        function dismissSmile() {
+            const overlayElement = document.getElementById('smileOverlay');
+            if (!overlayElement) return;
+
+            overlayElement.classList.remove('smile-overlay-visible');
+            overlayElement.classList.add('smile-overlay-hiding');
+            setTimeout(() => {
+                overlayElement.classList.add('hidden');
+                overlayElement.classList.remove('smile-overlay-hiding');
+                overlayElement.style.display = 'none';
+            }, 450);
+        }
+
+        function triggerSmile() {
+            const complimentElement = document.getElementById('complimentText');
+            const overlayElement = document.getElementById('smileOverlay');
+            const overlayTextElement = document.getElementById('smileOverlayText');
+
+            if (!complimentElement || !overlayElement || !overlayTextElement) return;
+
+            complimentElement.style.opacity = '0';
+            complimentElement.style.transform = 'translateY(8px)';
+            complimentElement.style.transition = 'all 0.3s ease';
+
+            overlayElement.classList.remove('hidden');
+            overlayElement.classList.remove('smile-overlay-hiding');
+            overlayElement.classList.remove('smile-overlay-visible');
+            overlayElement.style.display = 'flex';
+            void overlayElement.offsetWidth;
+            overlayElement.classList.add('smile-overlay-visible');
+
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * compliments.length);
+            } while (newIndex === currentComplimentIndex && compliments.length > 1);
+
+            currentComplimentIndex = newIndex;
+            const selectedCompliment = compliments[currentComplimentIndex];
+            complimentElement.textContent = `"${selectedCompliment}"`;
+            overlayTextElement.textContent = `"${selectedCompliment}"`;
+
+            setTimeout(() => {
+                complimentElement.style.opacity = '1';
+                complimentElement.style.transform = 'translateY(0)';
+            }, 220);
+        }
+
+        document.querySelectorAll('[data-gallery-filter]').forEach(button => {
+            button.addEventListener('click', () => {
+                const selectedCategory = button.dataset.galleryFilter;
+
+                document.querySelectorAll('[data-gallery-filter]').forEach(filterButton => {
+                    filterButton.setAttribute('aria-pressed', String(filterButton === button));
+                });
+
+                document.querySelectorAll('[data-gallery-category]').forEach(card => {
+                    card.hidden = selectedCategory !== 'all' && card.dataset.galleryCategory !== selectedCategory;
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
