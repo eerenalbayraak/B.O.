@@ -427,6 +427,14 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </header>
+        <div id="chatMemberSearchPanel" class="hidden border-b border-roseGold/15 bg-white/40 p-3">
+            <form id="chatMemberSearchForm" class="relative">
+                <label for="chatMemberSearchInput" class="sr-only">Tüm kullanıcıları ara</label>
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-warmGray"></i>
+                <input id="chatMemberSearchInput" type="search" maxlength="60" autocomplete="off" placeholder="Tüm kullanıcıları ara..." class="w-full rounded-xl border border-roseGold/20 bg-white/80 py-2.5 pl-9 pr-3 text-sm text-charcoal placeholder:text-warmGray focus:outline-none focus:border-roseGold">
+            </form>
+            <div id="chatMemberSearchResults" class="mt-2 max-h-36 space-y-1 overflow-y-auto"></div>
+        </div>
         <div id="chatFriendList" class="min-h-0 flex-1 overflow-y-auto p-3"></div>
         <div id="chatConversation" class="hidden min-h-0 flex-1 flex-col">
             <div id="chatMessages" class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite"></div>
@@ -1341,8 +1349,11 @@
                 chatRefreshTimer = null;
             }
             document.getElementById('chatWindowTitle').textContent = 'Mesajlar';
-            document.getElementById('chatSubtitle').textContent = 'Arkadaşlarınla özel sohbet et';
+            document.getElementById('chatSubtitle').textContent = isAdminUser(currentUser)
+                ? 'Kullanıcı ara veya bir sohbet seç'
+                : 'Arkadaşlarınla özel sohbet et';
             document.getElementById('chatBackButton').classList.add('hidden');
+            document.getElementById('chatMemberSearchPanel').classList.toggle('hidden', !isAdminUser(currentUser));
             document.getElementById('chatFriendList').classList.remove('hidden');
             document.getElementById('chatConversation').classList.add('hidden');
             document.getElementById('chatConversation').classList.remove('flex');
@@ -1369,23 +1380,6 @@
             const friendIds = [...new Set(acceptedRequests.map(request =>
                 request.sender_id === currentUser.id ? request.recipient_id : request.sender_id
             ))];
-            if (!friendIds.length) {
-                container.textContent = 'Sohbet etmek için önce arkadaş ekleyip isteğinin kabul edilmesini bekle.';
-                setChatStatus('');
-                return;
-            }
-
-            const { data: profiles, error: profilesError } = await noteDatabase
-                .from('member_profiles')
-                .select('user_id, display_name, avatar_url')
-                .in('user_id', friendIds);
-
-            if (profilesError) {
-                console.error('Sohbet profilleri yüklenemedi:', profilesError);
-                setChatStatus('Arkadaş profilleri yüklenemedi. Lütfen tekrar dene.', true);
-                return;
-            }
-
             const { data: recentMessages, error: messagesError } = await noteDatabase
                 .from('private_messages')
                 .select('id, sender_id, recipient_id, content, created_at, read_at')
@@ -1399,11 +1393,35 @@
                 return;
             }
 
+            const conversationIds = new Set(friendIds);
+            recentMessages.forEach(message => {
+                conversationIds.add(message.sender_id === currentUser.id ? message.recipient_id : message.sender_id);
+            });
+            const contactIds = [...conversationIds];
+            if (!contactIds.length) {
+                container.textContent = isAdminUser(currentUser)
+                    ? 'Kullanıcı bulmak için yukarıdaki aramayı kullan.'
+                    : 'Sohbet etmek için önce arkadaş ekleyip isteğinin kabul edilmesini bekle.';
+                setChatStatus('');
+                return;
+            }
+
+            const { data: profiles, error: profilesError } = await noteDatabase
+                .from('member_profiles')
+                .select('user_id, display_name, avatar_url')
+                .in('user_id', contactIds);
+
+            if (profilesError) {
+                console.error('Sohbet profilleri yüklenemedi:', profilesError);
+                setChatStatus('Sohbet profilleri yüklenemedi. Lütfen tekrar dene.', true);
+                return;
+            }
+
             const latestMessageByFriend = new Map();
             const unreadCountByFriend = new Map();
             recentMessages.forEach(message => {
                 const friendId = message.sender_id === currentUser.id ? message.recipient_id : message.sender_id;
-                if (!friendIds.includes(friendId)) return;
+                if (!contactIds.includes(friendId)) return;
 
                 if (!latestMessageByFriend.has(friendId)) {
                     latestMessageByFriend.set(friendId, message);
@@ -1487,6 +1505,7 @@
             document.getElementById('chatWindowTitle').textContent = profile.display_name;
             document.getElementById('chatSubtitle').textContent = 'Özel sohbet';
             document.getElementById('chatBackButton').classList.remove('hidden');
+            document.getElementById('chatMemberSearchPanel').classList.add('hidden');
             document.getElementById('chatFriendList').classList.add('hidden');
             document.getElementById('chatConversation').classList.remove('hidden');
             document.getElementById('chatConversation').classList.add('flex');
@@ -1690,7 +1709,7 @@
 
             if (error) {
                 console.error('Mesaj gönderilemedi:', error);
-                setChatStatus('Mesaj gönderilemedi. Arkadaşlığın devam ettiğini ve SQL kurulumunu kontrol et.', true);
+                setChatStatus('Mesaj gönderilemedi. Arkadaşlık durumunu veya admin mesajlaşma yetkisi için güncel Supabase SQL kurulumunu kontrol et.', true);
                 return;
             }
 
@@ -1706,6 +1725,72 @@
                 document.getElementById('chatMessageForm').requestSubmit();
             }
         });
+
+        const chatMemberSearchInput = document.getElementById('chatMemberSearchInput');
+        let chatMemberSearchTimer = null;
+        chatMemberSearchInput.addEventListener('input', () => {
+            window.clearTimeout(chatMemberSearchTimer);
+            chatMemberSearchTimer = window.setTimeout(searchChatMembers, 250);
+        });
+        document.getElementById('chatMemberSearchForm').addEventListener('submit', event => {
+            event.preventDefault();
+            window.clearTimeout(chatMemberSearchTimer);
+            searchChatMembers();
+        });
+
+        async function searchChatMembers() {
+            const results = document.getElementById('chatMemberSearchResults');
+            const query = chatMemberSearchInput.value.trim();
+            results.replaceChildren();
+            if (!isAdminUser(currentUser)) return;
+            if (query.length < 2) return;
+
+            const { data: profiles, error } = await noteDatabase
+                .from('member_profiles')
+                .select('user_id, display_name, avatar_url')
+                .ilike('display_name', `%${query}%`)
+                .neq('user_id', currentUser.id)
+                .limit(20);
+
+            if (error) {
+                console.error('Sohbet kullanıcıları aranamadı:', error);
+                results.textContent = 'Kullanıcılar aranamadı. Lütfen tekrar dene.';
+                return;
+            }
+            if (!profiles.length) {
+                results.textContent = 'Bu adla eşleşen kullanıcı bulunamadı.';
+                return;
+            }
+
+            profiles.forEach(profile => {
+                friendProfiles.set(profile.user_id, profile);
+                const resultButton = document.createElement('button');
+                resultButton.type = 'button';
+                resultButton.className = 'flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-charcoal hover:bg-rose-50 transition-colors';
+                const avatar = profile.avatar_url
+                    ? document.createElement('img')
+                    : createChatAvatarFallback(profile.display_name);
+                if (profile.avatar_url) {
+                    avatar.src = profile.avatar_url;
+                    avatar.alt = '';
+                    avatar.className = 'h-8 w-8 shrink-0 rounded-full border border-roseGold/30 object-cover';
+                    avatar.onerror = () => avatar.replaceWith(createChatAvatarFallback(profile.display_name));
+                }
+                const name = document.createElement('span');
+                name.className = 'min-w-0 flex-1 truncate';
+                name.textContent = profile.display_name;
+                const messageLabel = document.createElement('span');
+                messageLabel.className = 'shrink-0 text-xs text-roseGold';
+                messageLabel.textContent = 'Mesaj gönder';
+                resultButton.append(avatar, name, messageLabel);
+                resultButton.addEventListener('click', () => {
+                    results.replaceChildren();
+                    chatMemberSearchInput.value = '';
+                    openChatConversation(profile);
+                });
+                results.appendChild(resultButton);
+            });
+        }
 
         document.getElementById('friendSearchForm').addEventListener('submit', async event => {
             event.preventDefault();
