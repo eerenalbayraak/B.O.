@@ -132,10 +132,6 @@ create policy "Members can publish their own stories"
     to authenticated
     with check (
         user_id = (select auth.uid())
-        and author = coalesce(
-            nullif(btrim(auth.jwt() -> 'user_metadata' ->> 'display_name'), ''),
-            split_part(auth.jwt() ->> 'email', '@', 1)
-        )
         and char_length(btrim(author)) between 1 and 60
         and char_length(btrim(title)) between 1 and 100
         and char_length(btrim(content)) between 1 and 5000
@@ -468,6 +464,25 @@ revoke all on public.private_messages from anon, authenticated;
 grant select, insert on public.private_messages to authenticated;
 grant update (read_at) on public.private_messages to authenticated;
 
+create or replace function public.is_configured_admin(p_user_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+    select exists (
+        select 1
+        from auth.users as account
+        where account.id = p_user_id
+          and auth.uid() is not null
+          and lower(account.email) = 'erenalbayrak_55@hotmail.com'
+    );
+$$;
+
+revoke all on function public.is_configured_admin(uuid) from public, anon;
+grant execute on function public.is_configured_admin(uuid) to authenticated;
+
 drop policy if exists "Members can read their private messages" on public.private_messages;
 create policy "Members can read their private messages"
     on public.private_messages
@@ -487,16 +502,26 @@ create policy "Friends can send private messages"
         sender_id = (select auth.uid())
         and recipient_id <> (select auth.uid())
         and char_length(btrim(content)) between 1 and 2000
-        and exists (
-            select 1
-            from public.friend_requests friendship
-            where friendship.status = 'accepted'
-              and (
-                  (friendship.sender_id = (select auth.uid())
-                   and friendship.recipient_id = private_messages.recipient_id)
-                  or (friendship.recipient_id = (select auth.uid())
-                      and friendship.sender_id = private_messages.recipient_id)
-              )
+        and (
+            (auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com'
+            or exists (
+                select 1
+                from public.friend_requests friendship
+                where friendship.status = 'accepted'
+                  and (
+                      (friendship.sender_id = (select auth.uid())
+                       and friendship.recipient_id = private_messages.recipient_id)
+                      or (friendship.recipient_id = (select auth.uid())
+                          and friendship.sender_id = private_messages.recipient_id)
+                  )
+            )
+            or exists (
+                select 1
+                from public.private_messages admin_message
+                where admin_message.sender_id = private_messages.recipient_id
+                  and admin_message.recipient_id = (select auth.uid())
+                  and public.is_configured_admin(admin_message.sender_id)
+            )
         )
     );
 
