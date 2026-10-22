@@ -161,6 +161,22 @@
             border-color: rgba(212, 163, 115, 0.4);
         }
 
+        .story-card {
+            transform: scale(1);
+            transition: transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease;
+        }
+        .story-card:hover,
+        .story-card:focus-visible {
+            border-color: rgba(212, 163, 115, 0.45);
+            box-shadow: 0 14px 28px -12px rgba(212, 163, 115, 0.3);
+            outline: none;
+        }
+        .story-card-expanded {
+            z-index: 10;
+            transform: scale(1.025);
+            box-shadow: 0 20px 36px -14px rgba(212, 163, 115, 0.35);
+        }
+
         /* Subtle Audio Visualizer Animation */
         .bar {
             transition: height 0.15s ease;
@@ -1986,7 +2002,11 @@
 
         function appendStory(story, prepend = false) {
             const card = document.createElement('article');
-            card.className = 'glass-card rounded-2xl p-6 md:p-8 border border-roseGold/20';
+            card.className = 'story-card glass-card relative rounded-2xl p-6 md:p-8 border border-roseGold/20 cursor-pointer';
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-expanded', 'false');
+            card.setAttribute('aria-label', `${story.title} hikâyesinin tamamını göster`);
 
             const authorLine = document.createElement('p');
             authorLine.className = 'text-xs font-medium uppercase tracking-wider text-roseGold';
@@ -1997,8 +2017,14 @@
             title.textContent = story.title;
 
             const content = document.createElement('p');
-            content.className = 'text-sm text-warmGray leading-relaxed whitespace-pre-wrap break-words mt-4';
+            content.className = 'story-card-content text-sm text-warmGray leading-relaxed whitespace-pre-wrap break-words mt-4 overflow-hidden';
             content.textContent = story.content;
+            content.style.maxHeight = '6rem';
+            content.style.transition = 'max-height 350ms ease';
+
+            const expandHint = document.createElement('span');
+            expandHint.className = 'story-card-hint mt-2 block text-xs font-medium text-roseGold';
+            expandHint.textContent = 'Hikâyenin tamamını görmek için dokun';
 
             const date = document.createElement('time');
             date.className = 'block text-xs text-warmGray/80 mt-5';
@@ -2007,7 +2033,22 @@
                 dateStyle: 'medium'
             }).format(new Date(story.created_at));
 
-            card.append(authorLine, title, content, date);
+            card.append(authorLine, title, content, expandHint, date);
+            const toggleStory = () => {
+                const isExpanded = card.getAttribute('aria-expanded') === 'true';
+                card.setAttribute('aria-expanded', String(!isExpanded));
+                card.setAttribute('aria-label', `${story.title} hikâyesinin ${isExpanded ? 'önizlemesini göster' : 'tamamını göster'}`);
+                card.classList.toggle('story-card-expanded', !isExpanded);
+                content.style.maxHeight = isExpanded ? '6rem' : `${content.scrollHeight}px`;
+                expandHint.textContent = isExpanded ? 'Hikâyenin tamamını görmek için dokun' : 'Küçültmek için dokun';
+            };
+            card.addEventListener('click', toggleStory);
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleStory();
+                }
+            });
             const storiesList = document.getElementById('storiesList');
             if (prepend) {
                 storiesList.prepend(card);
@@ -2029,6 +2070,7 @@
             const { data, error } = await noteDatabase
                 .from('community_stories')
                 .select('id, author, title, content, created_at')
+                .eq('is_hidden', false)
                 .order('created_at', { ascending: false })
                 .limit(50);
 
@@ -2041,6 +2083,48 @@
             storiesList.replaceChildren();
             data.forEach(appendStory);
             storiesStatus.textContent = data.length ? '' : 'Henüz paylaşılmış bir hikâye yok. İlk hikâyeyi sen paylaş!';
+        }
+
+        const renderedPublicNoteIds = new Set();
+
+        function appendPublicNote(note) {
+            const container = document.getElementById('notesContainer');
+            if (note.id && renderedPublicNoteIds.has(note.id)) return;
+            if (note.id) renderedPublicNoteIds.add(note.id);
+            const noteCount = container.children.length + 1;
+            const newCard = document.createElement('div');
+            newCard.className = 'h-64';
+            if (note.id) newCard.dataset.noteId = note.id;
+            newCard.innerHTML = `
+                <div class="relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm">
+                    <div class="flex justify-between items-center text-roseGold">
+                        <i class="fa-solid fa-heart text-xl"></i>
+                        <span class="text-xs font-mono uppercase tracking-wider">${String(noteCount).padStart(2, '0')} / Yeni Not</span>
+                    </div>
+                    <h3 class="font-serif text-2xl text-charcoal text-center"></h3>
+                    <div class="text-right">
+                        <i class="fa-solid fa-envelope text-warmGray/60"></i>
+                    </div>
+                </div>
+            `;
+            newCard.querySelector('h3').textContent = note.author;
+            container.appendChild(newCard);
+        }
+
+        async function loadPublicNotes() {
+            if (!noteDatabase) return;
+            const { data, error } = await noteDatabase
+                .from('site_notes')
+                .select('id, author, created_at')
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (error) {
+                console.error('Ziyaretçi notları yüklenemedi:', error);
+                return;
+            }
+
+            data.reverse().forEach(appendPublicNote);
         }
 
         function setManagedText(element, value) {
@@ -2251,6 +2335,22 @@
                     setManagedText(heading, item.title);
                 }
                 setManagedText(document.querySelector(target.description), item.description);
+                if (item.section === 'favorites') {
+                    const musicCard = document.querySelector('#favorites .grid > div:nth-child(2)');
+                    const headingRow = musicCard?.querySelector('.space-y-6 > div:first-child');
+                    const musicLabel = headingRow?.querySelector('span:first-child');
+                    const providerLabel = headingRow?.querySelector('span:last-child');
+                    setManagedText(musicLabel, item.music_label);
+                    setManagedText(musicCard?.querySelector('h3'), item.music_title);
+                    if (providerLabel && typeof item.music_provider === 'string') {
+                        const providerIcon = providerLabel.querySelector('i');
+                        if (providerIcon) {
+                            providerLabel.replaceChildren(providerIcon, document.createTextNode(` ${item.music_provider}`));
+                        } else {
+                            setManagedText(providerLabel, item.music_provider);
+                        }
+                    }
+                }
             });
         }
 
@@ -2702,6 +2802,7 @@
             });
         }
         loadStories();
+        loadPublicNotes();
         loadManagedSiteContent();
 
         /* 1. FLOATING PARTICLES CANVAS */
@@ -2798,37 +2899,23 @@
             statusElement.textContent = 'Notunuz kaydediliyor...';
 
             try {
-                const { error } = await noteDatabase
+                const { data, error } = await noteDatabase
                     .from('site_notes')
-                    .insert({ author, content });
+                    .insert({ author, content })
+                    .select('id, author, created_at')
+                    .single();
 
                 if (error) throw error;
+                if (!data) throw new Error('Kaydedilen not bilgisi alınamadı.');
 
-                const container = document.getElementById('notesContainer');
-                const noteCount = container.children.length + 1;
-                const newCard = document.createElement('div');
-                newCard.className = 'h-64';
-                newCard.innerHTML = `
-                    <div class="relative w-full h-full rounded-2xl glass-card border border-roseGold/20 p-6 flex flex-col justify-between shadow-sm">
-                        <div class="flex justify-between items-center text-roseGold">
-                            <i class="fa-solid fa-heart text-xl"></i>
-                            <span class="text-xs font-mono uppercase tracking-wider">${String(noteCount).padStart(2, '0')} / Yeni Not</span>
-                        </div>
-                        <h3 class="font-serif text-2xl text-charcoal text-center"></h3>
-                        <div class="text-right">
-                            <i class="fa-solid fa-envelope text-warmGray/60"></i>
-                        </div>
-                    </div>
-                `;
-                newCard.querySelector('h3').textContent = author;
-                container.appendChild(newCard);
+                appendPublicNote(data);
 
                 authorInput.value = '';
                 contentInput.value = '';
                 statusElement.textContent = 'Notunuz başarıyla kaydedildi. Teşekkürler!';
                 statusElement.classList.remove('text-roseGold');
 
-                newCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                document.getElementById('notesContainer').lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             } catch (error) {
                 console.error('Not kaydedilemedi:', error);
                 statusElement.textContent = 'Not kaydedilemedi. Lütfen daha sonra tekrar deneyin.';
@@ -2877,7 +2964,20 @@
             "Her güzel hikâye, kendine inanmayı seçtiğin bir anla başlayabilir.",
             "Gündelik hayatın karmaşasında kendi içindeki zarafeti korumak en büyük sanattır.",
             "Taze çekilmiş bir kahve kokusu ve sevdiğin bir melodi... Bazen tüm dünya bundan ibarettir.",
-            "Etrafına yaydığın samimi enerji, çevrendekilerin gününü aydınlatmaya yeter."
+            "Etrafına yaydığın samimi enerji, çevrendekilerin gününü aydınlatmaya yeter.",
+            "Kendine nazikçe yaklaşmak, yeniden başlamanın en zarif yoludur.",
+            "Her şeyi kusursuz yapmak zorunda değilsin; özenle attığın küçük bir adım da değerlidir.",
+            "Dinlenmek, yolundan vazgeçmek değil; kendine iyi bakarak devam etmektir.",
+            "Zor bir gün, güzelliğinin ya da gücünün ölçüsü değildir.",
+            "Kendine tanıdığın anlayış, yarına daha yumuşak bir kalple ulaşmanı sağlar.",
+            "Yavaşlamak bazen yönünü yeniden bulmanın en sakin yoludur.",
+            "Başarı, kendini incitmeden de büyüyebileceğini hatırladığında güzelleşir.",
+            "Bugün kendine, sevdiğin bir dosta göstereceğin incelikle davran.",
+            "Küçük ilerlemeler de büyük bir sabrın zarif izleridir.",
+            "Her duyguna yer aç; hiçbir fırtına gökyüzünün tamamı değildir.",
+            "Kendini olduğun yerde kabul etmek, hayallerine doğru yürümene engel değil.",
+            "İç huzurun, herkese yetişmekten değil, kendine de yetişmekten geçer.",
+            "En güzel dönüşümler, kendine verdiğin sessiz ve şefkatli sözlerle başlar."
         ];
 
         let currentComplimentIndex = 0;
