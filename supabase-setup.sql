@@ -2,14 +2,20 @@ create table if not exists public.site_notes (
     id uuid primary key default gen_random_uuid(),
     author text not null check (char_length(btrim(author)) between 1 and 80),
     content text not null check (char_length(btrim(content)) between 1 and 1000),
+    is_hidden boolean not null default false,
     created_at timestamptz not null default now()
 );
+
+alter table public.site_notes
+    add column if not exists is_hidden boolean not null default false;
 
 alter table public.site_notes enable row level security;
 
 revoke all on public.site_notes from anon, authenticated;
 grant insert on public.site_notes to anon, authenticated;
 grant select on public.site_notes to authenticated;
+grant select (id, author, created_at) on public.site_notes to anon;
+grant update, delete on public.site_notes to authenticated;
 
 drop policy if exists "Public can submit notes" on public.site_notes;
 create policy "Public can submit notes"
@@ -19,12 +25,35 @@ create policy "Public can submit notes"
     with check (
         char_length(btrim(author)) between 1 and 80
         and char_length(btrim(content)) between 1 and 1000
+        and is_hidden = false
     );
 
 drop policy if exists "Configured admin can read notes" on public.site_notes;
 create policy "Configured admin can read notes"
     on public.site_notes
     for select
+    to authenticated
+    using ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com');
+
+drop policy if exists "Public can read visible note cards" on public.site_notes;
+create policy "Public can read visible note cards"
+    on public.site_notes
+    for select
+    to anon, authenticated
+    using (is_hidden = false);
+
+drop policy if exists "Configured admin can update notes" on public.site_notes;
+create policy "Configured admin can update notes"
+    on public.site_notes
+    for update
+    to authenticated
+    using ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com')
+    with check ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com');
+
+drop policy if exists "Configured admin can delete notes" on public.site_notes;
+create policy "Configured admin can delete notes"
+    on public.site_notes
+    for delete
     to authenticated
     using ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com');
 
@@ -109,21 +138,29 @@ create table if not exists public.community_stories (
     author text not null check (char_length(btrim(author)) between 1 and 60),
     title text not null check (char_length(btrim(title)) between 1 and 100),
     content text not null check (char_length(btrim(content)) between 1 and 5000),
+    is_hidden boolean not null default false,
     created_at timestamptz not null default now()
 );
+
+alter table public.community_stories
+    add column if not exists is_hidden boolean not null default false;
 
 alter table public.community_stories enable row level security;
 
 revoke all on public.community_stories from anon, authenticated;
 grant select on public.community_stories to anon, authenticated;
 grant insert on public.community_stories to authenticated;
+grant update, delete on public.community_stories to authenticated;
 
 drop policy if exists "Anyone can read community stories" on public.community_stories;
 create policy "Anyone can read community stories"
     on public.community_stories
     for select
     to anon, authenticated
-    using (true);
+    using (
+        is_hidden = false
+        or (auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com'
+    );
 
 drop policy if exists "Members can publish their own stories" on public.community_stories;
 create policy "Members can publish their own stories"
@@ -135,7 +172,23 @@ create policy "Members can publish their own stories"
         and char_length(btrim(author)) between 1 and 60
         and char_length(btrim(title)) between 1 and 100
         and char_length(btrim(content)) between 1 and 5000
+        and is_hidden = false
     );
+
+drop policy if exists "Configured admin can update community stories" on public.community_stories;
+create policy "Configured admin can update community stories"
+    on public.community_stories
+    for update
+    to authenticated
+    using ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com')
+    with check ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com');
+
+drop policy if exists "Configured admin can delete community stories" on public.community_stories;
+create policy "Configured admin can delete community stories"
+    on public.community_stories
+    for delete
+    to authenticated
+    using ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com');
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('profile-photos', 'profile-photos', true, 3145728, array['image/jpeg', 'image/png', 'image/webp'])
