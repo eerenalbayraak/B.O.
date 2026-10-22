@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not Yönetimi | Beyza Özcan</title>
+    <title>Yönetim Paneli | Beyza Özcan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,6 +13,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: #F7F5F1;
             color: #2B2A2A;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.72);
@@ -26,13 +27,37 @@
             background: rgba(212, 163, 115, 0.18);
             color: #F3E8DF;
         }
+        body.admin-dark-theme {
+            background: #191716;
+            color: #fff;
+        }
+        body.admin-dark-theme .glass-card {
+            background: rgba(37, 34, 32, 0.92);
+            border-color: rgba(212, 163, 115, 0.28);
+        }
+        body.admin-dark-theme [class*="text-[#2B2A2A]"],
+        body.admin-dark-theme [class*="text-[#5F5A53]"],
+        body.admin-dark-theme [class*="text-[#8C857B]"] {
+            color: #f5eee8 !important;
+        }
+        body.admin-dark-theme input,
+        body.admin-dark-theme textarea,
+        body.admin-dark-theme select {
+            color: #fff;
+            background-color: #252220;
+        }
+        body.admin-dark-theme input::placeholder,
+        body.admin-dark-theme textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
         .notes-panel-visible {
             display: grid;
             grid-template-columns: minmax(0, 1fr);
         }
         #loginPanel.hidden,
         #notesPanel.hidden,
-        #contentPanel.hidden {
+        #contentPanel.hidden,
+        #storiesManagementPanel.hidden {
             display: none;
         }
         @media (min-width: 1024px) {
@@ -86,10 +111,9 @@
                         <i class="fa-regular fa-images w-4"></i>
                         Site İçerikleri
                     </button>
-                    <a href="index.html#stories" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 hover:bg-white/10 hover:text-white transition-colors">
-                        <i class="fa-regular fa-bookmark w-4"></i>
-                        Hikâyeleri Görüntüle
-                    </a>
+                    <button type="button" data-admin-section-target="stories" class="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-white/65 hover:bg-white/10 hover:text-white transition-colors text-left">
+                        <i class="fa-regular fa-bookmark w-4"></i> Hikâyeler
+                    </button>
                 </nav>
 
                 <div class="mt-auto space-y-3 pt-10">
@@ -110,13 +134,18 @@
                         <p class="text-xs tracking-[0.22em] uppercase text-[#D4A373]">Genel Bakış</p>
                         <h1 class="font-serif text-4xl md:text-5xl mt-1">Gelen Notlar</h1>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-start gap-3">
                         <span class="w-9 h-9 rounded-full bg-[#F3E8DF] text-[#D4A373] flex items-center justify-center">
                             <i class="fa-regular fa-user"></i>
                         </span>
-                        <div class="min-w-0">
+                        <div class="min-w-0 text-right">
                             <p class="text-xs text-[#8C857B]">Yönetici</p>
                             <p id="adminUserLabel" class="text-sm font-medium text-[#2B2A2A] truncate">Yönetici hesabı</p>
+                            <button id="adminThemeToggleButton" type="button" class="mt-2 inline-flex items-center gap-2 rounded-full border border-[#D4A373]/35 bg-white/60 px-3 py-1.5 text-xs text-[#5F5A53] hover:bg-white/90 transition-colors" aria-pressed="false">
+                                <i class="fa-regular fa-moon text-[#D4A373]"></i>
+                                <span>Koyu temayı aç</span>
+                            </button>
+                            <p id="adminThemeStatus" class="mt-1 min-h-4 text-[11px] text-[#8C857B]" role="status" aria-live="polite"></p>
                         </div>
                     </div>
                 </header>
@@ -158,6 +187,23 @@
                 <div id="notesList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
                 <p id="notesStatus" class="py-6 text-center text-sm text-[#8C857B]" role="status" aria-live="polite"></p>
                 <button id="loadMoreButton" type="button" class="hidden mx-auto mt-4 px-6 py-3 rounded-full border border-[#D4A373]/40 text-sm text-[#8C857B] hover:bg-white transition-colors">Daha Fazla Yükle</button>
+            </div>
+
+            <div id="storiesManagementPanel" class="hidden min-w-0 px-4 py-6 md:px-8 lg:px-10 lg:py-9">
+                <header class="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                    <div>
+                        <p class="text-xs tracking-[0.22em] uppercase text-[#D4A373]">Topluluk</p>
+                        <h1 class="font-serif text-4xl md:text-5xl mt-1">Hikâye Yönetimi</h1>
+                        <p class="mt-2 text-sm text-[#8C857B]">Hikâyeleri düzenleyin, silin veya yayından gizleyin.</p>
+                    </div>
+                    <button id="refreshStoriesButton" type="button" class="self-start flex items-center gap-2 rounded-xl border border-[#D4A373]/30 bg-white/70 px-4 py-2.5 text-sm text-[#8C857B] hover:bg-white transition-colors">
+                        <i class="fa-solid fa-rotate"></i> Yenile
+                    </button>
+                </header>
+                <p id="storiesSummary" class="mb-4 text-sm text-[#8C857B]">Hikâyeler yükleniyor...</p>
+                <div id="adminStoriesList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+                <p id="adminStoriesStatus" class="py-6 text-center text-sm text-[#8C857B]" role="status" aria-live="polite"></p>
+                <button id="loadMoreStoriesButton" type="button" class="hidden mx-auto mt-4 px-6 py-3 rounded-full border border-[#D4A373]/40 text-sm text-[#8C857B] hover:bg-white transition-colors">Daha Fazla Yükle</button>
             </div>
 
             <div id="contentPanel" class="hidden min-w-0 px-4 py-6 md:px-8 lg:px-10 lg:py-9">
@@ -219,8 +265,13 @@
         const notesStatus = document.getElementById('notesStatus');
         const notesSummary = document.getElementById('notesSummary');
         const loadMoreButton = document.getElementById('loadMoreButton');
+        const storiesList = document.getElementById('adminStoriesList');
+        const storiesStatus = document.getElementById('adminStoriesStatus');
+        const storiesSummary = document.getElementById('storiesSummary');
+        const loadMoreStoriesButton = document.getElementById('loadMoreStoriesButton');
         const pageSize = 50;
         let nextOffset = 0;
+        let nextStoryOffset = 0;
         let adminClient = null;
         let totalNotesCount = 0;
 
@@ -233,6 +284,107 @@
                 dateStyle: 'medium',
                 timeStyle: 'short'
             }).format(new Date(value));
+        }
+
+        function createAdminButton(label, onClick, tone = 'neutral') {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = label;
+            button.className = tone === 'danger'
+                ? 'rounded-lg border border-rose-300/60 px-2.5 py-1.5 text-[11px] text-rose-700 hover:bg-rose-50 transition-colors'
+                : 'rounded-lg border border-[#D4A373]/30 px-2.5 py-1.5 text-[11px] text-[#8C6B4F] hover:bg-[#D4A373]/10 transition-colors';
+            button.addEventListener('click', onClick);
+            return button;
+        }
+
+        function openInlineEditor(card, display, fields, onSave) {
+            if (card.querySelector('.admin-inline-editor')) return;
+            const form = document.createElement('form');
+            form.className = 'admin-inline-editor mt-4 space-y-3 border-t border-[#D4A373]/20 pt-4';
+            const inputs = {};
+
+            fields.forEach(field => {
+                const label = document.createElement('label');
+                label.className = 'block text-xs text-[#8C857B]';
+                label.textContent = field.label;
+
+                const input = field.multiline
+                    ? document.createElement('textarea')
+                    : document.createElement('input');
+                input.name = field.name;
+                input.required = true;
+                input.maxLength = field.maxLength;
+                input.value = field.value;
+                input.className = 'mt-1 w-full rounded-xl border border-[#D4A373]/25 bg-white/80 px-3 py-2 text-sm focus:outline-none focus:border-[#D4A373]';
+                if (field.multiline) {
+                    input.rows = field.rows || 5;
+                    input.classList.add('resize-y');
+                }
+                label.appendChild(input);
+                form.appendChild(label);
+                inputs[field.name] = input;
+            });
+
+            const status = document.createElement('p');
+            status.className = 'text-xs text-[#8C857B]';
+            status.setAttribute('role', 'status');
+            const actions = document.createElement('div');
+            actions.className = 'flex gap-2';
+            const saveButton = document.createElement('button');
+            saveButton.type = 'submit';
+            saveButton.textContent = 'Değişiklikleri kaydet';
+            saveButton.className = 'rounded-xl bg-[#D4A373] px-4 py-2 text-xs font-medium text-white hover:bg-[#c59464] transition-colors';
+            const cancelButton = createAdminButton('Vazgeç', () => {
+                form.remove();
+                display.classList.remove('hidden');
+            });
+            actions.append(saveButton, cancelButton);
+            form.append(status, actions);
+            display.classList.add('hidden');
+            card.appendChild(form);
+
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                saveButton.disabled = true;
+                status.textContent = 'Kaydediliyor...';
+                try {
+                    const values = Object.fromEntries(
+                        Object.entries(inputs).map(([name, input]) => [name, input.value.trim()])
+                    );
+                    if (Object.values(values).some(value => !value)) {
+                        status.textContent = 'Tüm alanları doldurun.';
+                        saveButton.disabled = false;
+                        return;
+                    }
+                    await onSave(values);
+                } catch (error) {
+                    console.error('İçerik düzenlenemedi:', error);
+                    status.textContent = `Kaydedilemedi: ${error.message || 'Beklenmeyen bir hata oluştu.'}`;
+                    saveButton.disabled = false;
+                }
+            });
+        }
+
+        async function updateManagedRow(table, id, changes) {
+            const { data, error } = await adminClient
+                .from(table)
+                .update(changes)
+                .eq('id', id)
+                .select('id')
+                .single();
+            if (error) throw error;
+            if (!data) throw new Error('Kayıt bulunamadı veya güncelleme yetkiniz yok.');
+        }
+
+        async function deleteManagedRow(table, id) {
+            const { data, error } = await adminClient
+                .from(table)
+                .delete()
+                .eq('id', id)
+                .select('id')
+                .single();
+            if (error) throw error;
+            if (!data) throw new Error('Kayıt bulunamadı veya silme yetkiniz yok.');
         }
 
         function appendNote(note) {
@@ -256,9 +408,138 @@
             content.className = 'text-sm text-[#5F5A53] leading-relaxed whitespace-pre-wrap break-words';
             content.textContent = note.content;
 
-            header.append(author, date);
-            card.append(header, content);
+            const details = document.createElement('div');
+            details.className = 'flex flex-col gap-2';
+            const dateAndActions = document.createElement('div');
+            dateAndActions.className = 'flex flex-wrap items-center justify-end gap-2';
+            if (note.is_hidden) {
+                const hiddenLabel = document.createElement('span');
+                hiddenLabel.className = 'rounded-full bg-amber-100 px-2.5 py-1 text-[10px] text-amber-800';
+                hiddenLabel.textContent = 'Gizli';
+                dateAndActions.appendChild(hiddenLabel);
+            }
+            dateAndActions.append(date, createAdminButton('Düzenle', () => openInlineEditor(card, content, [
+                { name: 'author', label: 'Gönderen adı', value: note.author, maxLength: 80 },
+                { name: 'content', label: 'Not', value: note.content, maxLength: 1000, multiline: true }
+            ], async values => {
+                await updateManagedRow('site_notes', note.id, values);
+                await loadNotes(true);
+            })));
+            dateAndActions.appendChild(createAdminButton(note.is_hidden ? 'Göster' : 'Gizle', async () => {
+                try {
+                    await updateManagedRow('site_notes', note.id, { is_hidden: !note.is_hidden });
+                    await loadNotes(true);
+                } catch (error) {
+                    console.error('Not görünürlüğü değiştirilemedi:', error);
+                    notesStatus.textContent = `Notun görünürlüğü değiştirilemedi: ${error.message}`;
+                }
+            }));
+            dateAndActions.appendChild(createAdminButton('Sil', async () => {
+                if (!window.confirm('Bu not kalıcı olarak silinsin mi?')) return;
+                try {
+                    await deleteManagedRow('site_notes', note.id);
+                    await loadNotes(true);
+                } catch (error) {
+                    console.error('Not silinemedi:', error);
+                    notesStatus.textContent = `Not silinemedi: ${error.message}`;
+                }
+            }, 'danger'));
+            details.appendChild(content);
+            header.append(author, dateAndActions);
+            card.append(header, details);
             notesList.appendChild(card);
+        }
+
+        function appendManagedStory(story) {
+            const card = document.createElement('article');
+            card.className = 'glass-card rounded-2xl p-5 md:p-6';
+
+            const header = document.createElement('div');
+            header.className = 'mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between';
+            const heading = document.createElement('div');
+            const title = document.createElement('h2');
+            title.className = 'font-serif text-xl text-[#2B2A2A]';
+            title.textContent = story.title;
+            const author = document.createElement('p');
+            author.className = 'mt-1 text-xs text-[#8C857B]';
+            author.textContent = story.author;
+            heading.append(title, author);
+
+            const dateAndActions = document.createElement('div');
+            dateAndActions.className = 'flex flex-wrap items-center justify-end gap-2';
+            const date = document.createElement('time');
+            date.className = 'text-xs text-[#8C857B]';
+            date.dateTime = story.created_at;
+            date.textContent = formatDate(story.created_at);
+            if (story.is_hidden) {
+                const hiddenLabel = document.createElement('span');
+                hiddenLabel.className = 'rounded-full bg-amber-100 px-2.5 py-1 text-[10px] text-amber-800';
+                hiddenLabel.textContent = 'Gizli';
+                dateAndActions.appendChild(hiddenLabel);
+            }
+            dateAndActions.append(date, createAdminButton('Düzenle', () => openInlineEditor(card, body, [
+                { name: 'author', label: 'Yazar adı', value: story.author, maxLength: 60 },
+                { name: 'title', label: 'Başlık', value: story.title, maxLength: 100 },
+                { name: 'content', label: 'Hikâye', value: story.content, maxLength: 5000, multiline: true, rows: 8 }
+            ], async values => {
+                await updateManagedRow('community_stories', story.id, values);
+                await loadStories(true);
+            })));
+            dateAndActions.appendChild(createAdminButton(story.is_hidden ? 'Göster' : 'Gizle', async () => {
+                try {
+                    await updateManagedRow('community_stories', story.id, { is_hidden: !story.is_hidden });
+                    await loadStories(true);
+                } catch (error) {
+                    console.error('Hikâyenin görünürlüğü değiştirilemedi:', error);
+                    storiesStatus.textContent = `Hikâyenin görünürlüğü değiştirilemedi: ${error.message}`;
+                }
+            }));
+            dateAndActions.appendChild(createAdminButton('Sil', async () => {
+                if (!window.confirm('Bu hikâye kalıcı olarak silinsin mi?')) return;
+                try {
+                    await deleteManagedRow('community_stories', story.id);
+                    await loadStories(true);
+                } catch (error) {
+                    console.error('Hikâye silinemedi:', error);
+                    storiesStatus.textContent = `Hikâye silinemedi: ${error.message}`;
+                }
+            }, 'danger'));
+
+            const body = document.createElement('p');
+            body.className = 'text-sm text-[#5F5A53] leading-relaxed whitespace-pre-wrap break-words';
+            body.textContent = story.content;
+            header.append(heading, dateAndActions);
+            card.append(header, body);
+            storiesList.appendChild(card);
+        }
+
+        async function loadStories(reset = false) {
+            if (reset) {
+                nextStoryOffset = 0;
+                storiesList.replaceChildren();
+            }
+            loadMoreStoriesButton.disabled = true;
+            storiesStatus.textContent = 'Hikâyeler yükleniyor...';
+            const { data, error, count } = await adminClient
+                .from('community_stories')
+                .select('id, author, title, content, created_at, is_hidden', { count: 'exact' })
+                .order('created_at', { ascending: false })
+                .range(nextStoryOffset, nextStoryOffset + pageSize - 1);
+
+            if (error) {
+                console.error('Hikâyeler alınamadı:', error);
+                storiesStatus.textContent = 'Hikâyeler yüklenemedi. Supabase tablo ve erişim kurallarını kontrol edin.';
+                loadMoreStoriesButton.disabled = false;
+                return;
+            }
+
+            data.forEach(appendManagedStory);
+            nextStoryOffset += data.length;
+            const totalStoriesCount = count ?? nextStoryOffset;
+            storiesSummary.textContent = `${nextStoryOffset} / ${totalStoriesCount} hikâye yüklendi`;
+            storiesStatus.textContent = data.length === 0 && nextStoryOffset === 0 ? 'Henüz paylaşılmış bir hikâye yok.' : '';
+            loadMoreStoriesButton.classList.toggle('hidden', data.length < pageSize);
+            loadMoreStoriesButton.disabled = false;
         }
 
         async function loadNotes(reset = false) {
@@ -272,7 +553,7 @@
 
             const { data, error, count } = await adminClient
                 .from('site_notes')
-                .select('id, author, content, created_at', { count: 'exact' })
+                .select('id, author, content, created_at, is_hidden', { count: 'exact' })
                 .order('created_at', { ascending: false })
                 .range(nextOffset, nextOffset + pageSize - 1);
 
@@ -360,12 +641,15 @@
             },
             site_texts: {
                 title: 'Site Metinleri',
-                hint: 'Bölüm başlıklarını ve kısa açıklamalarını düzenleyin.',
+                hint: 'Bölüm başlıklarını, açıklamalarını ve Favoriler & Müzik alt başlıklarını düzenleyin.',
                 fields: [
                     { name: 'section', label: 'Site bölümü', type: 'select', options: [['about', 'Giriş bölümü'], ['notes', 'Özel Notlar'], ['stories', 'Topluluk Hikâyeleri'], ['gallery', 'Anların Estetiği'], ['favorites', 'Favoriler & Müzik'], ['daily', 'Günün Tebessümü']] },
                     { name: 'label', label: 'Üst başlık', type: 'text', required: true, maxLength: 100 },
                     { name: 'title', label: 'Bölüm başlığı', type: 'text', required: true, maxLength: 140 },
-                    { name: 'description', label: 'Açıklama', type: 'textarea', required: true, maxLength: 400 }
+                    { name: 'description', label: 'Açıklama', type: 'textarea', required: true, maxLength: 400 },
+                    { name: 'music_label', label: 'Müzik kartı üst yazısı (Favoriler bölümü)', type: 'text', maxLength: 80 },
+                    { name: 'music_title', label: 'Şarkı listesi başlığı', type: 'text', maxLength: 140 },
+                    { name: 'music_provider', label: 'Müzik bağlantısı etiketi', type: 'text', maxLength: 60 }
                 ],
                 itemTitle: item => item.title || item.section || 'Bölüm metni'
             }
@@ -378,6 +662,7 @@
         const contentForm = document.getElementById('contentForm');
         let managedContent = {};
         let editingContentId = null;
+        let adminCurrentUser = null;
 
         function setContentStatus(message, isError = false) {
             contentStatus.textContent = message;
@@ -456,6 +741,13 @@
                     description: description.textContent.trim()
                 });
             });
+            const musicCard = doc.querySelector('#favorites .grid > div:nth-child(2)');
+            const favoriteText = result.site_texts.find(item => item.section === 'favorites');
+            if (favoriteText && musicCard) {
+                favoriteText.music_label = musicCard.querySelector('.space-y-6 > div:first-child > span')?.textContent.trim() || '';
+                favoriteText.music_title = musicCard.querySelector('h3')?.textContent.trim() || '';
+                favoriteText.music_provider = musicCard.querySelector('.space-y-6 > div:first-child > span:last-child')?.textContent.trim() || '';
+            }
             const dailyHeading = [...doc.querySelectorAll('h2')].find(heading => heading.textContent.trim() === 'Günün Tebessümü');
             if (dailyHeading) {
                 result.site_texts.push({
@@ -494,13 +786,25 @@
 
             managedContent = Object.fromEntries(data.map(row => [row.content_key, row.content_value]));
             const missingKeys = contentKeys.filter(key => !Object.hasOwn(managedContent, key));
-            if (missingKeys.length) {
+            const favoritesText = managedContent.site_texts?.find(item => item.section === 'favorites');
+            const missingMusicTexts = favoritesText &&
+                (!favoritesText.music_label || !favoritesText.music_title || !favoritesText.music_provider);
+            if (missingKeys.length || missingMusicTexts) {
                 const response = await fetch('index.html', { cache: 'no-store' });
                 if (!response.ok) throw new Error('Mevcut site içerikleri başlangıç verisi olarak alınamadı.');
                 const defaults = extractDefaultContent(await response.text());
                 for (const key of missingKeys) {
                     managedContent[key] = defaults[key];
                     await saveContentCategory(key);
+                }
+                if (missingMusicTexts) {
+                    const defaultFavoritesText = defaults.site_texts.find(item => item.section === 'favorites');
+                    Object.assign(favoritesText, {
+                        music_label: defaultFavoritesText.music_label,
+                        music_title: defaultFavoritesText.music_title,
+                        music_provider: defaultFavoritesText.music_provider
+                    });
+                    await saveContentCategory('site_texts');
                 }
             }
             renderContentItems();
@@ -602,7 +906,10 @@
                 }
                 input.id = `contentField-${field.name}`;
                 input.name = field.name;
+                const isMusicHeadingField = ['music_label', 'music_title', 'music_provider'].includes(field.name);
                 input.required = Boolean(field.required) || (field.type === 'file' && !entry?.image_url);
+                input.disabled = isMusicHeadingField;
+                input.classList.toggle('opacity-50', input.disabled);
                 if (field.maxLength) input.maxLength = field.maxLength;
                 if (field.type !== 'file') input.value = entry?.[field.name] || '';
                 else {
@@ -612,8 +919,25 @@
                 wrapper.appendChild(input);
                 fields.appendChild(wrapper);
             });
+            syncMusicHeadingFields();
             contentEditorCard.classList.remove('hidden');
             contentEditorCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function syncMusicHeadingFields() {
+            const isFavoritesSection = contentTypeSelect.value === 'site_texts' &&
+                document.getElementById('contentField-section')?.value === 'favorites';
+            const favoritesText = managedContent.site_texts?.find(item => item.section === 'favorites');
+            ['music_label', 'music_title', 'music_provider'].forEach(name => {
+                const field = document.getElementById(`contentField-${name}`);
+                if (!field) return;
+                field.disabled = !isFavoritesSection;
+                field.required = isFavoritesSection;
+                field.classList.toggle('opacity-50', field.disabled);
+                if (isFavoritesSection && !field.value && favoritesText?.[name]) {
+                    field.value = favoritesText[name];
+                }
+            });
         }
 
         async function uploadSiteImage(file) {
@@ -664,6 +988,8 @@
             const entry = {};
             const previousContent = managedContent[type];
             contentDefinitions[type].fields.forEach(field => {
+                if (['music_label', 'music_title', 'music_provider'].includes(field.name) &&
+                    document.getElementById('contentField-section')?.value !== 'favorites') return;
                 if (field.type !== 'file') entry[field.name] = String(formData.get(field.name) || '').trim();
             });
             try {
@@ -699,18 +1025,23 @@
                 saveButton.disabled = false;
             }
         });
+        contentForm.addEventListener('change', event => {
+            if (event.target.id === 'contentField-section') syncMusicHeadingFields();
+        });
 
         document.querySelectorAll('[data-admin-section-target]').forEach(button => {
             button.addEventListener('click', async () => {
-                document.getElementById('messages').classList.add('hidden');
-                document.getElementById('contentPanel').classList.remove('hidden');
+                const target = button.dataset.adminSectionTarget;
+                document.getElementById('messages').classList.toggle('hidden', target !== 'messages');
+                document.getElementById('contentPanel').classList.toggle('hidden', target !== 'content');
+                document.getElementById('storiesManagementPanel').classList.toggle('hidden', target !== 'stories');
                 document.querySelectorAll('.admin-sidebar [data-admin-section-target], .admin-sidebar a[href="#messages"]').forEach(nav => {
                     nav.classList.remove('admin-nav-active');
                     nav.classList.add('text-white/65');
                 });
                 button.classList.add('admin-nav-active');
                 button.classList.remove('text-white/65');
-                if (!contentKeys.every(key => Object.hasOwn(managedContent, key))) {
+                if (target === 'content' && !contentKeys.every(key => Object.hasOwn(managedContent, key))) {
                     try {
                         await loadManagedContent();
                     } catch (error) {
@@ -718,11 +1049,13 @@
                         setContentStatus(`Site içerikleri yüklenemedi: ${error.message}`, true);
                     }
                 }
+                if (target === 'stories') await loadStories(true);
             });
         });
         document.querySelector('.admin-sidebar a[href="#messages"]').addEventListener('click', event => {
             event.preventDefault();
             document.getElementById('contentPanel').classList.add('hidden');
+            document.getElementById('storiesManagementPanel').classList.add('hidden');
             document.getElementById('messages').classList.remove('hidden');
             document.querySelectorAll('.admin-sidebar [data-admin-section-target], .admin-sidebar a[href="#messages"]').forEach(nav => {
                 nav.classList.remove('admin-nav-active');
@@ -745,9 +1078,42 @@
             loginPanel.classList.add('hidden');
             notesPanel.classList.remove('hidden');
             notesPanel.classList.add('notes-panel-visible');
+            adminCurrentUser = user;
             document.getElementById('adminUserLabel').textContent = user.email;
+            updateAdminThemeButton(user);
             await loadNotes(true);
         }
+
+        function updateAdminThemeButton(user) {
+            const isDark = user.user_metadata?.theme === 'dark';
+            const button = document.getElementById('adminThemeToggleButton');
+            button.setAttribute('aria-pressed', String(isDark));
+            button.innerHTML = isDark
+                ? '<i class="fa-regular fa-sun text-[#D4A373]"></i><span>Açık temayı kullan</span>'
+                : '<i class="fa-regular fa-moon text-[#D4A373]"></i><span>Koyu temayı kullan</span>';
+            document.body.classList.toggle('admin-dark-theme', isDark);
+        }
+
+        document.getElementById('adminThemeToggleButton').addEventListener('click', async event => {
+            const button = event.currentTarget;
+            const status = document.getElementById('adminThemeStatus');
+            if (!adminClient || !adminCurrentUser) return;
+            button.disabled = true;
+            status.textContent = 'Tema tercihi kaydediliyor...';
+            const nextTheme = adminCurrentUser.user_metadata?.theme === 'dark' ? 'light' : 'dark';
+            const { data, error } = await adminClient.auth.updateUser({
+                data: { ...adminCurrentUser.user_metadata, theme: nextTheme }
+            });
+            button.disabled = false;
+            if (error) {
+                console.error('Yönetici tema tercihi kaydedilemedi:', error);
+                status.textContent = 'Tema tercihi kaydedilemedi. Lütfen tekrar deneyin.';
+                return;
+            }
+            adminCurrentUser = data.user;
+            updateAdminThemeButton(data.user);
+            status.textContent = 'Tema tercihin kaydedildi.';
+        });
 
         document.getElementById('adminEmail').value = config.adminEmail;
 
@@ -803,10 +1169,14 @@
             notesPanel.classList.add('hidden');
             notesPanel.classList.remove('notes-panel-visible');
             loginPanel.classList.remove('hidden');
+            adminCurrentUser = null;
+            document.body.classList.remove('admin-dark-theme');
             showLoginMessage('');
         });
 
         loadMoreButton.addEventListener('click', () => loadNotes());
+        loadMoreStoriesButton.addEventListener('click', () => loadStories());
+        document.getElementById('refreshStoriesButton').addEventListener('click', () => loadStories(true));
         document.getElementById('noteSearch').addEventListener('input', filterNotes);
         document.getElementById('refreshNotesButton').addEventListener('click', () => loadNotes(true));
     </script>
