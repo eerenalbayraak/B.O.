@@ -226,6 +226,26 @@
         .smile-overlay-hiding {
             animation: smileFloatOut 0.45s ease forwards;
         }
+
+        .about-panel-chip {
+            border: 1px solid rgba(212, 163, 115, 0.36);
+            background: rgba(255, 255, 255, 0.7);
+            color: #2B2A2A;
+            box-shadow: 0 12px 30px -18px rgba(212, 163, 115, 0.65);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .about-panel-chip:hover {
+            transform: translateY(-1px);
+            border-color: rgba(212, 163, 115, 0.6);
+            box-shadow: 0 16px 32px -20px rgba(212, 163, 115, 0.7);
+        }
+
+        .about-panel-tab[aria-selected="true"] {
+            background: rgba(212, 163, 115, 0.12);
+            border-color: rgba(212, 163, 115, 0.44);
+            color: #2B2A2A;
+        }
     </style>
 </head>
 <body class="relative min-h-screen">
@@ -497,7 +517,33 @@
                     <i class="fa-solid fa-heart text-roseGold"></i> Favori Anlar
                 </a>
             </div>
+            <div class="mt-8 text-center">
+                <button id="aboutPanelTrigger" type="button" class="about-panel-chip inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-semibold tracking-[0.2em] uppercase text-charcoal">
+                    <i class="fa-solid fa-circle-info text-roseGold"></i>
+                    Hakkında
+                </button>
+            </div>
         </section>
+
+        <div id="aboutPanelModal" class="fixed inset-0 z-[80] hidden items-center justify-center bg-charcoal/40 backdrop-blur-sm px-4">
+            <div class="glass-card relative w-full max-w-4xl rounded-3xl border border-roseGold/20 p-5 md:p-6 shadow-[0_26px_60px_rgba(43,42,42,0.18)]">
+                <button id="closeAboutPanelModal" type="button" class="absolute right-4 top-4 h-9 w-9 rounded-full text-warmGray hover:bg-rose-100 hover:text-roseGold transition-colors" aria-label="Hakkında penceresini kapat">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="pr-10">
+                    <p class="text-xs tracking-[0.22em] uppercase text-roseGold">Hakkında</p>
+                    <h2 class="mt-2 font-serif text-3xl md:text-4xl text-charcoal">İçerik kartları</h2>
+                </div>
+
+                <div class="mt-5 flex flex-wrap gap-2">
+                    <button type="button" data-about-tab="statistics" aria-selected="true" class="about-panel-tab rounded-full border border-roseGold/30 bg-white/70 px-4 py-2 text-xs font-medium tracking-[0.16em] uppercase text-charcoal transition-colors">İstatistik Kartları</button>
+                    <button type="button" data-about-tab="collaboration" aria-selected="false" class="about-panel-tab rounded-full border border-roseGold/30 bg-white/70 px-4 py-2 text-xs font-medium tracking-[0.16em] uppercase text-charcoal transition-colors">İş birliği türleri</button>
+                    <button type="button" data-about-tab="contact" aria-selected="false" class="about-panel-tab rounded-full border border-roseGold/30 bg-white/70 px-4 py-2 text-xs font-medium tracking-[0.16em] uppercase text-charcoal transition-colors">Hızlı iletişim</button>
+                </div>
+
+                <div id="aboutPanelContent" class="mt-6"></div>
+            </div>
+        </div>
 
         <!-- INTERACTIVE MEMORY & NOTE BOX -->
         <section id="notes" class="space-y-8">
@@ -2131,6 +2177,122 @@
             if (element && typeof value === 'string') element.textContent = value;
         }
 
+        const defaultAboutPanelData = {
+            statistics: [
+                { panel_type: 'statistics', icon: 'fa-solid fa-chart-line', title: 'Yıllık Çalışma', value: '6+', description: 'Yıllık deneyimle şekillenen özgün projeler ve stratejik içerik üretimi.' },
+                { panel_type: 'statistics', icon: 'fa-solid fa-briefcase', title: 'Proje Sayısı', value: '24', description: 'Marka, içerik ve kurumsal iletişim alanında tamamlanan işler.' },
+                { panel_type: 'statistics', icon: 'fa-solid fa-heart', title: 'Müşteri Memnuniyeti', value: '96%', description: 'Güven, samimiyet ve net iletişim üzerine kurulu iş ortaklıkları.' }
+            ],
+            collaboration: [
+                { panel_type: 'collaboration', icon: 'fa-solid fa-seedling', title: 'Marka Geliştirme', description: 'Duygusal anlatım ve güçlü kurumsal kimlik üretimi.' },
+                { panel_type: 'collaboration', icon: 'fa-solid fa-pen-nib', title: 'İçerik Yönetimi', description: 'Instagram, blog ve hikâye anlatımı için içerik planları ve metin odaklı üretim.' },
+                { panel_type: 'collaboration', icon: 'fa-solid fa-handshake', title: 'Kurumsal Ortaklık', description: 'Etkinlikler, kampanyalar ve marka birlikteliklerinde profesyonel destek.' }
+            ],
+            contact: [
+                { panel_type: 'contact', icon: 'fa-solid fa-message', title: 'İletişime Geç', description: 'Projeler, iş birlikleri ve içerik danışmanlığı için kısa bir ileti yazın.' }
+            ]
+        };
+
+        function renderAboutPanelContent(items = []) {
+            const activeTab = document.querySelector('[data-about-tab][aria-selected="true"]')?.dataset.aboutTab || 'statistics';
+            const container = document.getElementById('aboutPanelContent');
+            if (!container) return;
+
+            const cards = Array.isArray(items) && items.length
+                ? items.filter(item => item.panel_type === activeTab)
+                : defaultAboutPanelData[activeTab] || [];
+
+            if (activeTab === 'contact') {
+                const contactMessage = cards[0] || defaultAboutPanelData.contact[0];
+                container.innerHTML = `
+                    <div class="grid gap-5 md:grid-cols-[1.1fr_1.3fr]">
+                        <article class="glass-card rounded-2xl border border-roseGold/15 p-5">
+                            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-roseGold text-xl">
+                                <i class="${contactMessage.icon || 'fa-solid fa-message'}"></i>
+                            </div>
+                            <h3 class="font-serif text-2xl text-charcoal">${contactMessage.title || 'İletişime Geç'}</h3>
+                            <p class="mt-3 text-sm leading-relaxed text-warmGray">${contactMessage.description || 'İletişime geçmek için kısa bir mesaj bırakın.'}</p>
+                        </article>
+                        <form id="aboutQuickContactForm" class="glass-card rounded-2xl border border-roseGold/15 p-5 md:p-6 space-y-4">
+                            <div>
+                                <label class="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-warmGray" for="aboutContactName">Adınız</label>
+                                <input id="aboutContactName" name="name" type="text" class="w-full rounded-xl border border-roseGold/20 bg-white/80 px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:border-roseGold" placeholder="Adınız" required>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-warmGray" for="aboutContactEmail">E-posta</label>
+                                <input id="aboutContactEmail" name="email" type="email" class="w-full rounded-xl border border-roseGold/20 bg-white/80 px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:border-roseGold" placeholder="ornek@email.com" required>
+                            </div>
+                            <div>
+                                <label class="mb-1 block text-xs font-medium uppercase tracking-[0.16em] text-warmGray" for="aboutContactMessage">Mesaj</label>
+                                <textarea id="aboutContactMessage" name="message" rows="4" class="w-full rounded-xl border border-roseGold/20 bg-white/80 px-3 py-2.5 text-sm text-charcoal focus:outline-none focus:border-roseGold" placeholder="İş birliği veya görüşme talebinizi yazın..." required></textarea>
+                            </div>
+                            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-roseGold px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-roseGold/90">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                Mesajı Gönder
+                            </button>
+                            <p id="aboutContactStatus" class="min-h-5 text-sm text-warmGray" role="status" aria-live="polite"></p>
+                        </form>
+                    </div>
+                `;
+
+                document.getElementById('aboutQuickContactForm').addEventListener('submit', event => {
+                    event.preventDefault();
+                    const status = document.getElementById('aboutContactStatus');
+                    status.textContent = 'Mesajınız hazır. İletişim bilgileri için admin panelinden yönlendirilebilir.';
+                    event.target.reset();
+                });
+                return;
+            }
+
+            container.innerHTML = `<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">${cards.map(card => `
+                <article class="glass-card rounded-2xl border border-roseGold/15 p-5">
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-roseGold text-xl">
+                        <i class="${card.icon || 'fa-solid fa-star'}"></i>
+                    </div>
+                    ${card.value ? `<p class="font-serif text-4xl text-charcoal">${card.value}</p>` : ''}
+                    <h3 class="mt-2 font-serif text-2xl text-charcoal">${card.title || 'Kart'}</h3>
+                    <p class="mt-3 text-sm leading-relaxed text-warmGray">${card.description || ''}</p>
+                </article>
+            `).join('')}</div>`;
+        }
+
+        function bindAboutPanelModal() {
+            const modal = document.getElementById('aboutPanelModal');
+            const trigger = document.getElementById('aboutPanelTrigger');
+            const closeButton = document.getElementById('closeAboutPanelModal');
+
+            if (!modal || !trigger || !closeButton) return;
+
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                renderAboutPanelContent(window.managedSiteContent?.about_panel || defaultAboutPanelData.statistics);
+            };
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            trigger.addEventListener('click', openModal);
+            closeButton.addEventListener('click', closeModal);
+            modal.addEventListener('click', event => {
+                if (event.target === modal) closeModal();
+            });
+
+            document.querySelectorAll('[data-about-tab]').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('[data-about-tab]').forEach(tab => {
+                        const selected = tab === button;
+                        tab.setAttribute('aria-selected', String(selected));
+                        tab.classList.toggle('bg-white/70', !selected);
+                        tab.classList.toggle('about-panel-tab', true);
+                    });
+                    renderAboutPanelContent(window.managedSiteContent?.about_panel || defaultAboutPanelData[button.dataset.aboutTab]);
+                });
+            });
+        }
+
         function renderManagedGallery(items) {
             const container = document.querySelector('#gallery .grid.grid-cols-1');
             if (!container) return;
@@ -2364,11 +2526,17 @@
                 return;
             }
             managedSiteContent = Object.fromEntries(data.map(row => [row.content_key, row.content_value]));
+            window.managedSiteContent = managedSiteContent;
             if (Array.isArray(managedSiteContent.gallery)) renderManagedGallery(managedSiteContent.gallery);
             if (Array.isArray(managedSiteContent.favorites)) renderManagedFavorites(managedSiteContent.favorites);
             if (Array.isArray(managedSiteContent.music)) renderManagedMusic(managedSiteContent.music);
             if (Array.isArray(managedSiteContent.inspiration_cards)) renderManagedInspirationCards(managedSiteContent.inspiration_cards);
             if (Array.isArray(managedSiteContent.site_texts)) renderManagedSiteTexts(managedSiteContent.site_texts);
+            if (Array.isArray(managedSiteContent.about_panel)) {
+                renderAboutPanelContent(managedSiteContent.about_panel);
+            } else {
+                renderAboutPanelContent(defaultAboutPanelData.statistics);
+            }
         }
 
         document.getElementById('accountButton').addEventListener('click', () => {
@@ -2804,6 +2972,7 @@
         loadStories();
         loadPublicNotes();
         loadManagedSiteContent();
+        bindAboutPanelModal();
 
         /* 1. FLOATING PARTICLES CANVAS */
         const canvas = document.getElementById('particleCanvas');
