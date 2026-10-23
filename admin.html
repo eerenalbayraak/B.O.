@@ -652,6 +652,18 @@
                     { name: 'music_provider', label: 'Müzik bağlantısı etiketi', type: 'text', maxLength: 60 }
                 ],
                 itemTitle: item => item.title || item.section || 'Bölüm metni'
+            },
+            about_panel: {
+                title: 'Hakkında Paneli',
+                hint: 'İstatistik kartları, iş birliği türleri ve hızlı iletişim kartını düzenleyin.',
+                fields: [
+                    { name: 'panel_type', label: 'Kart tipi', type: 'select', options: [['statistics', 'İstatistik kartları'], ['collaboration', 'İş birliği türleri'], ['contact', 'Hızlı iletişim']] },
+                    { name: 'title', label: 'Kart başlığı', type: 'text', required: true, maxLength: 100 },
+                    { name: 'value', label: 'İstatistik değeri (isteğe bağlı)', type: 'text', maxLength: 40 },
+                    { name: 'description', label: 'Açıklama', type: 'textarea', required: true, maxLength: 260 },
+                    { name: 'icon', label: 'İkon', type: 'select', options: [['fa-solid fa-chart-line', 'Grafik'], ['fa-solid fa-briefcase', 'İş'], ['fa-solid fa-heart', 'Kalp'], ['fa-solid fa-seedling', 'Bitki'], ['fa-solid fa-pen-nib', 'Kalem'], ['fa-solid fa-handshake', 'El sıkışma'], ['fa-solid fa-envelope', 'E-posta'], ['fa-solid fa-message', 'Mesaj']] }
+                ],
+                itemTitle: item => item.title || 'Hakkında kartı'
             }
         };
         const contentKeys = Object.keys(contentDefinitions);
@@ -719,6 +731,16 @@
                     url: link.getAttribute('href') || ''
                 });
             });
+
+            result.about_panel = [
+                { id: 'about-stat-1', panel_type: 'statistics', icon: 'fa-solid fa-chart-line', title: 'Yıllık Çalışma', value: '6+', description: 'Yıllık deneyimle şekillenen özgün projeler ve stratejik içerik üretimi.' },
+                { id: 'about-stat-2', panel_type: 'statistics', icon: 'fa-solid fa-briefcase', title: 'Proje Sayısı', value: '24', description: 'Marka, içerik ve kurumsal iletişim alanında tamamlanan işler.' },
+                { id: 'about-stat-3', panel_type: 'statistics', icon: 'fa-solid fa-heart', title: 'Müşteri Memnuniyeti', value: '96%', description: 'Güven, samimiyet ve net iletişim üzerine kurulu iş ortaklıkları.' },
+                { id: 'about-collab-1', panel_type: 'collaboration', icon: 'fa-solid fa-seedling', title: 'Marka Geliştirme', description: 'Duygusal anlatım ve güçlü kurumsal kimlik üretimi.' },
+                { id: 'about-collab-2', panel_type: 'collaboration', icon: 'fa-solid fa-pen-nib', title: 'İçerik Yönetimi', description: 'Instagram, blog ve hikâye anlatımı için içerik planları ve metin odaklı üretim.' },
+                { id: 'about-collab-3', panel_type: 'collaboration', icon: 'fa-solid fa-handshake', title: 'Kurumsal Ortaklık', description: 'Etkinlikler, kampanyalar ve marka birlikteliklerinde profesyonel destek.' },
+                { id: 'about-contact-1', panel_type: 'contact', icon: 'fa-solid fa-message', title: 'İletişime Geç', description: 'Projeler, iş birlikleri ve içerik danışmanlığı için kısa bir ileti yazın.' }
+            ];
 
             const textSections = [
                 ['about', '#about', 'Giriş bölümü'],
@@ -806,6 +828,13 @@
                     });
                     await saveContentCategory('site_texts');
                 }
+            }
+            if (!managedContent.about_panel || !Array.isArray(managedContent.about_panel) || !managedContent.about_panel.length) {
+                const response = await fetch('index.html', { cache: 'no-store' });
+                if (!response.ok) throw new Error('Hakkında paneli için başlangıç verisi alınamadı.');
+                const defaults = extractDefaultContent(await response.text());
+                managedContent.about_panel = defaults.about_panel;
+                await saveContentCategory('about_panel');
             }
             renderContentItems();
             setContentStatus('Mevcut site içerikleri panele aktarıldı. Buradaki düzenlemeler Supabase’e kaydedilir.');
