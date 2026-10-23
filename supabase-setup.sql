@@ -58,7 +58,7 @@ create policy "Configured admin can delete notes"
     using ((auth.jwt() ->> 'email') = 'erenalbayrak_55@hotmail.com');
 
 create table if not exists public.site_content (
-    content_key text primary key check (content_key in ('gallery', 'favorites', 'music', 'inspiration_cards', 'site_texts')),
+    content_key text primary key check (content_key in ('gallery', 'favorites', 'music', 'inspiration_cards', 'site_texts', 'about_panel')),
     content_value jsonb not null,
     updated_by uuid references auth.users(id) on delete set null,
     updated_at timestamptz not null default now()
